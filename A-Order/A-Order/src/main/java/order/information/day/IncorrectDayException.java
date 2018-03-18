@@ -9,8 +9,9 @@ package order.information.day;
  *
  * @author Usuario
  */
-public class IncorrectDayException extends Exception{
+public class IncorrectDayException extends RuntimeException{
     
+    //You cannot have the same day twice a week...
     String message;
     
     IncorrectDayException(String error){

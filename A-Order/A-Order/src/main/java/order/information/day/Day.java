@@ -14,10 +14,10 @@ import java.util.ArrayList;
 public abstract class Day {
 
     //Here will be stored this day's subjects
-    protected ArrayList<String> subjects;
+    protected ArrayList<String> subjects = new ArrayList<>();;
     
     //This method should return subjects
-    public ArrayList<String> getSubject(){
+    public ArrayList<String> getSubjects(){
         return subjects;
     }
     

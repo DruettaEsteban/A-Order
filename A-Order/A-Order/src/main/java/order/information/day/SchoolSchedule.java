@@ -19,18 +19,32 @@ public class SchoolSchedule{
     private final HashMap<EnumWeekDays, Day> days;
     
     
-    SchoolSchedule(){
+    public SchoolSchedule(){
         days = new HashMap<>();
     }    
     
     //Add a day's Schedule
-    public void addDay(CompleteDay newDay) throws IncorrectDayException{
+    public void addDay(CompleteDay newDay){
         //Evaluate for repetitions
         if(days.containsKey(newDay.getDay())){
             throw new IncorrectDayException("That Day Already Exists");
         }else{
             //Add new day
-            days.put(newDay.getDay(), newDay.toLighterDay());
+            days.put(newDay.getDay(), new LighterDay(newDay));    //Returns a lighter version
         }
     }
+    
+    //A class created to use less memory
+    private class LighterDay extends Day{
+
+        LighterDay(CompleteDay day){
+            this.subjects = day.subjects;
+        }
+    }
+    
+    //Returns an specific day's subjects
+    public ArrayList getDaySubjects(EnumWeekDays dayOfTheWeek){
+        return this.days.get(dayOfTheWeek).getSubjects();
+    }
+    
 }

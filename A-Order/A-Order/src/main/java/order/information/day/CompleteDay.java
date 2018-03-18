@@ -6,6 +6,8 @@
 package order.information.day;
 
 
+
+
 /**
  *
  * @author Usuario
@@ -17,6 +19,7 @@ public class CompleteDay extends Day{
     
     //A day is required to create an object
     public CompleteDay(EnumWeekDays dayOfTheWeek){
+
         this.dayOfTheWeek = dayOfTheWeek;
     }
     
@@ -25,14 +28,10 @@ public class CompleteDay extends Day{
         this.subjects.add(subject);
     }
     
-    //Returns a lighter version
-    public Day toLighterDay(){
-        return new LighterDay(this);
-    }
-    
     //Return this object day
     public EnumWeekDays getDay(){
         return dayOfTheWeek;
     }
+    
 
 }
