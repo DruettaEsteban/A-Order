@@ -6,12 +6,8 @@
 package com.druetta.base;
 
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Iterator;
@@ -22,14 +18,12 @@ import java.util.Scanner;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
-import org.neuroph.core.NeuralNetwork;
 import org.neuroph.core.data.DataSet;
 import org.neuroph.core.data.DataSetRow;
 import org.neuroph.core.events.LearningEvent;
 import org.neuroph.core.events.LearningEventListener;
 import org.neuroph.nnet.MultiLayerPerceptron;
 import org.neuroph.nnet.learning.BackPropagation;
-import org.neuroph.util.TransferFunctionType;
 import org.neuroph.util.random.WeightsRandomizer;
 /**
  *
@@ -37,8 +31,8 @@ import org.neuroph.util.random.WeightsRandomizer;
  */
 public class main implements LearningEventListener{
     //hidden
-    private static final int HIDDEN_H = 10;
-    private static final int HIDDEN_L = 50;
+    private static final int HIDDEN_H = 1;
+    private static final int HIDDEN_L = 5;
     //inputs
     private static final int INPUT_H = 10000;
     //outputs
@@ -65,10 +59,10 @@ public class main implements LearningEventListener{
     }
     
     private static void serializeAndClose() throws FileNotFoundException, IOException{
-        try (ObjectOutputStream serializer = new ObjectOutputStream(new FileOutputStream(perceptronLocation))) {
-            serializer.writeObject(net);
-            System.exit(0);
-        }
+        
+        net.save(perceptronLocation.toString());
+        System.exit(0);
+        
     }
     
     private static void train(File traningSetLocation, int trainingCicles){
@@ -149,7 +143,7 @@ public class main implements LearningEventListener{
         net.learn(trainingSet, bk);
         
     }
-    
+    private static boolean continueTraining = false;
     private static void train(File traningSetLocation){
         ArrayList<String> names = new ArrayList(Arrays.stream(traningSetLocation.list()).collect(Collectors.toList()));
         LinkedHashSet<File> directories = new LinkedHashSet(Arrays.stream(traningSetLocation.listFiles()).map((File v) -> 
@@ -223,25 +217,24 @@ public class main implements LearningEventListener{
             }
         }
         
+        continueTraining = true;
         BackPropagation bk = new BackPropagation();
         
-        net.learnInNewThread(trainingSet, bk);
+        net.learn(trainingSet, bk);
         
         
     }
     
     //BEGINNING
     private void run() throws FileNotFoundException, IOException, ClassNotFoundException, InterruptedException{
-        perceptronLocation = new File(System.getProperty("user.dir")+"\\perceptron.ser");
+        perceptronLocation = new File(System.getProperty("user.dir")+"\\perceptron.nnet");
         if(!perceptronLocation.exists()){ 
-            perceptronLocation.createNewFile();
             net = PerceptronGenerator.generatePerceptron(INPUT_H, 1, HIDDEN_L, HIDDEN_H);
             net.randomizeWeights(new WeightsRandomizer(new Random(123)));
+            net.save(perceptronLocation.toString());
             System.out.println("a");
         }else{
-            try (ObjectInputStream desSerializer = new ObjectInputStream(new FileInputStream(perceptronLocation))) {
-                net = (MultiLayerPerceptron) desSerializer.readObject();
-            }
+            net = (MultiLayerPerceptron) MultiLayerPerceptron.createFromFile(perceptronLocation);
         }
         
         
@@ -256,7 +249,11 @@ public class main implements LearningEventListener{
             train(trainingLocation);
         });
         train.start();
+        
         //train(TRAINING_CICLES, trainingLocation);
+        while(!continueTraining){
+            Thread.sleep(1000);
+        }
         
         //stopControl
         Thread ask = new Thread(() -> {
