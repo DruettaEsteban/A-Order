@@ -1,0 +1,14 @@
+<component name="libraryTable">
+  <library name="cmu_time_awb">
+    <CLASSES>
+      <root url="jar://$USER_HOME$/Desktop/sounds/cmu_time_awb.jar!/" />
+      <root url="jar://$USER_HOME$/Desktop/sounds/cmu_us_kal.jar!/" />
+      <root url="jar://$USER_HOME$/Desktop/sounds/en_us.jar!/" />
+      <root url="jar://$USER_HOME$/Desktop/sounds/freetts-jsapi10.jar!/" />
+      <root url="jar://$USER_HOME$/Desktop/sounds/freetts.jar!/" />
+      <root url="jar://$USER_HOME$/Desktop/sounds/mbrola.jar!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES />
+  </library>
+</component>
