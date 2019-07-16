@@ -7,16 +7,22 @@ import java.io.IOException;
 public abstract class Communicator {
 
     protected SerialPort sp;
-    Communicator(String port){
+    Communicator(String port, int baudRate){
         sp = SerialPort.getCommPort(port);
-        sp.setComPortParameters(9600, 8, 1, 0);
+        sp.setComPortParameters(baudRate, 8, 1, 0);
         sp.setComPortTimeouts(SerialPort.TIMEOUT_WRITE_BLOCKING, 0, 0);
 
 
         if(sp.openPort()){
             System.out.println("Port openned");
         }else{
-            System.err.println("Could not open port");
+            try {
+                throw new IOException("Could not open port");
+            } catch (IOException e) {
+                e.printStackTrace();
+                System.exit(-1);
+            }
+
         }
     }
 

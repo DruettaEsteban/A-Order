@@ -1,11 +1,11 @@
 package arduino.communication;
 
 
-public final class ArduinoAdvancedCommunicator extends ArduinoBasicCommunicator{
+public final class ArduinoAdvancedCommunicator extends Communicator{
 
 
-    public ArduinoAdvancedCommunicator(String port) {
-        super(port);
+    public ArduinoAdvancedCommunicator(String port, int baudRate) {
+        super(port, baudRate);
     }
 
     @Override

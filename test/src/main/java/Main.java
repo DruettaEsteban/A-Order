@@ -1,29 +1,43 @@
 import arduino.communication.ArduinoBasicCommunicator;
 import questions.BasicQuestion;
+import questions.Question;
+import questions.QuestionsQueue;
 import ui.MainFrame;
-import ui.Speaker;
 import user.interaction.Status;
 
 import javax.naming.NamingException;
 import java.io.IOException;
 
 
-
 public class Main {
     public static boolean RESET = false;
 
-    public static void main(String[] args) throws NamingException, IOException {
+    public static void main(String[] args) {
+
+        ArduinoBasicCommunicator communicator = new ArduinoBasicCommunicator("COM3", 9800);
+
+
+        /*
+        TO DO LIST;
+
+        Multiple Choice
+        Add videos - Interactive Sounds -> Question CLASS
+        Automatize routine features
+
+        AT THE END
+        A whole new thread designed to RESET everything (Add to method evaluateReset() - Question CLASS)
+        KISS BRENDA
+         */
+
+        Question onePlusOnE = new BasicQuestion(communicator, "One plus one equals 4", Status.FALSO);
+        Question myNameIs = new BasicQuestion(communicator, "Your name is Esteban", Status.VERDADERO);
+
+        QuestionsQueue<Question> questionsQueue = new QuestionsQueue<>();
+        questionsQueue.addQuestions(onePlusOnE, myNameIs);
         MainFrame frame = MainFrame.getInstance();
-        ArduinoBasicCommunicator arduinoAdvancedCommunicator = new ArduinoBasicCommunicator("COM3");
-        BasicQuestion question = new BasicQuestion(arduinoAdvancedCommunicator, "2 plus 2 equals 4", Status.VERDADERO, new Speaker());
 
+        frame.showQuestions(questionsQueue);
 
-        while (true) {
-            Speaker speaker = new Speaker();
-            speaker.say(question.evaluate() ? "YOU ARE RIGHT" : "YOU ARE WRONG");
-            speaker.disallocate();
-
-        }
     }
 
 

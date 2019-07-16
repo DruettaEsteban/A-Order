@@ -4,8 +4,8 @@ import java.util.Scanner;
 public class ArduinoBasicCommunicator extends Communicator {
 
 
-    public ArduinoBasicCommunicator(String port) {
-        super(port);
+    public ArduinoBasicCommunicator(String port, int baudRate) {
+        super(port, baudRate);
     }
 
     public String receive() {
