@@ -25,9 +25,15 @@ public class Controller {
     }
 
     public static void letTheGameBegin(FrameMP frameMP, QuestionsFactory questionsFactory, ArduinoCommunication communication){
+
         Thread gameCycle = new Thread(() -> {
 
-            frameMP.changeQuestionAndOptions(questionsFactory.getRandomQuestion());
+            Platform.runLater(new Runnable() {
+                @Override
+                public void run() {
+                    frameMP.changeQuestionAndOptions(questionsFactory.getRandomQuestion());
+                }
+            });
 
             ScheduledThreadPoolExecutor executor = new ScheduledThreadPoolExecutor(1);
 

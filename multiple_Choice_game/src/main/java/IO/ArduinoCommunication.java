@@ -29,14 +29,16 @@ public final class ArduinoCommunication {
         Scanner scanner = new Scanner(this.sp.getInputStream());
         int number = 4;
             //System.out.println("here");
-            while (scanner.hasNextLine()) {  //COULD BE IMPROVED
-                try {
-                    number = Integer.parseInt(scanner.nextLine());
-                } catch (Exception e) {
-                    System.out.println("Unknown error occurred");
-                    e.printStackTrace();
-                }
+        while (scanner.hasNextLine()) {  //COULD BE IMPROVED
+            try {
+                String result = scanner.nextLine();
+                if(result.isEmpty()) return null;
+                number = Integer.parseInt(result);
+            } catch (Exception e) {
+                System.out.println("Unknown error occurred");
+                e.printStackTrace();
             }
+        }
         switch (number){
             case 0:
                 return Answers.A;

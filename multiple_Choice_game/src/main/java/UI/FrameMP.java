@@ -85,8 +85,6 @@ public class FrameMP extends Application{
         ObservableList<javafx.scene.Node> list = answersContainer.getChildren();
         list.addAll(optionA, optionB,optionC, optionD);
 
-
-
         //QUESTION SETTINGS
         questionContainer = new VBox();
         questionContainer.setSpacing(QUESTION_CONTAINER_SPACING);
@@ -94,6 +92,7 @@ public class FrameMP extends Application{
         question = new Label();
         VBox.setMargin(question, new Insets(RESPONSE_QUESTION_TOP_MARGIN, 0, 0,0));
         question.setStyle("-fx-border-color: black;  -fx-border-width: 2; -fx-border-style: solid inside; -fx-border-radius: 50;");
+        question.setFont(Font.font("verdana", FontWeight.BOLD, FontPosture.REGULAR,30));
         question.setMaxSize(QUESTION_WIDTH*2, QUESTION_HEIGHT*2);
         question.setMinSize(QUESTION_WIDTH*2, QUESTION_HEIGHT*2);
         question.setPrefSize(QUESTION_WIDTH*2, QUESTION_HEIGHT*2);
@@ -221,19 +220,13 @@ public class FrameMP extends Application{
         turnWhite(Answers.D);
     }
 
+
     private void turnWhite(Answers answer){
-        int duration = FADE_COLOR_TIME_MILLIS;
 
-
-        Thread turnGreen = new Thread(() -> {
-            try {
-                Thread.sleep(duration);
-                options.get(answer.getAnswer()).setStyle("-fx-background-color: white; -fx-background-radius: 50 50 50 50;"+"-fx-padding: "+ ANSWER_HEIGHT + " " + ANSWER_WIDTH + " " + ANSWER_HEIGHT + " "+ ANSWER_WIDTH+"; -fx-border-color: black;  -fx-border-width: 2; -fx-border-style: solid inside; -fx-border-radius: 50;");
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
+        Platform.runLater(()->{
+            options.forEach(option -> option.setStyle("-fx-background-color: white; -fx-border-color: black;  -fx-border-width: 2; -fx-border-style: solid inside; -fx-border-radius: 50;"));
         });
-        turnGreen.start();
+
 
     }
 
@@ -391,7 +384,7 @@ public class FrameMP extends Application{
             executorService.schedule(() -> {
                 simpleTreatment.treatWrong(wrong);
                 simpleTreatment.treatRight(correct);
-            }, 15, TimeUnit.SECONDS);
+            }, 10, TimeUnit.SECONDS);
 
 
         }
