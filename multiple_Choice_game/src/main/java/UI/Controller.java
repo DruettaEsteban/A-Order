@@ -1,5 +1,6 @@
 package UI;
 
+import IO.ArduinoCommunication;
 import IO.QuestionsFactory;
 import javafx.application.Platform;
 
@@ -14,31 +15,44 @@ public class Controller {
     }
 
     public void control(FrameMP frameMP){
-
         QuestionsFactory questionsFactory = QuestionsFactory.newInstance();
-
-        LinkedList<String> options = new LinkedList<>();
-        String A = "SOY LA RESPUESTA A";
-        String B = "SOY LA RESPUESTA B";
-        String C = "SOY LA RESPUESTA C";
-        String D = "SOY LA RESPUESTA D Y CORRECTA";
-
-        Collections.addAll(options, A,B,C,D);
-
-        Question question = new Question(options, Answers.D, "Soy la pregunta");
-
-        frameMP.changeQuestionAndOptions(questionsFactory.getRandomQuestion());
-
-        //frameMP.changeQuestionAndOptions(questionsFactory.getRandomQuestion());
-
-
-        //frameMP.evaluateAndDisplay(Answers.C);
-
-        //frameMP.changeQuestionAndOptions(questionsFactory.getRandomQuestion());
+        ArduinoCommunication communication = new ArduinoCommunication("COM3");
+        letTheGameBegin(frameMP, questionsFactory, communication);
 
 
 
+        //RESOLVER PROBLEMA DE RESPUESTA CORRECTA
+    }
 
+    public static void letTheGameBegin(FrameMP frameMP, QuestionsFactory questionsFactory, ArduinoCommunication communication){
+        Thread gameCycle = new Thread(() -> {
+
+            frameMP.changeQuestionAndOptions(questionsFactory.getRandomQuestion());
+
+            ScheduledThreadPoolExecutor executor = new ScheduledThreadPoolExecutor(1);
+
+            executor.schedule(() -> {
+                Platform.runLater(()->{
+
+                    Answers answers = null;
+                    while (answers == null){
+                        answers = communication.readPort();
+                        //System.out.println("here");
+                    }
+                    System.out.println(answers);
+                    frameMP.evaluateAndDisplay(answers);
+                    executor.schedule(new Runnable() {
+                        @Override
+                        public void run() {
+                            Controller.letTheGameBegin(frameMP, questionsFactory, communication);
+                        }
+                    },20000, TimeUnit.MILLISECONDS);
+
+                });
+            },5000, TimeUnit.MILLISECONDS);
+
+        });
+        gameCycle.start();
     }
 
 }
