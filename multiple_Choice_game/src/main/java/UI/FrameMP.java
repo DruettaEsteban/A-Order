@@ -39,11 +39,9 @@ public class FrameMP extends Application{
     private final double QUESTION_HEIGHT = getPercentageHeight(10);
     private final double QUESTION_WIDTH = getPercentageWidth(45);
     private final double QUESTION_CONTAINER_SPACING = getPercentageWidth(0.2);
-
     private final int FADE_TIME_MILLIS = 1000;
     private final int RESIZE_TIME_MILLIS = 1000;
     private final int FADE_COLOR_TIME_MILLIS = 1000;
-
     private Label optionA, optionB, optionC, optionD, question;
     private LinkedList<Label> options;
     private VBox answersContainer;
@@ -129,6 +127,7 @@ public class FrameMP extends Application{
                 thread.start();
             }
         };
+
         scene.addEventHandler(KeyEvent.KEY_PRESSED, eventHandler);
 
     }
@@ -411,7 +410,7 @@ public class FrameMP extends Application{
     }
 
     //ITALIANISIMO
-
+    //Sonidos italianos
 
 
 }

@@ -51,7 +51,14 @@ public final class ArduinoCommunication {
             default:
                 return null;
         }
+    }
 
+    public void clearPort(){
+        Scanner scanner = new Scanner(this.sp.getInputStream());
+        //System.out.println("here");
+        while (scanner.hasNextLine()) {  //COULD BE IMPROVED
+            scanner.nextLine();
+        }
     }
 
 

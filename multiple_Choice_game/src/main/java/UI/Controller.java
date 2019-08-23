@@ -45,6 +45,7 @@ public class Controller {
                         answers = communication.readPort();
                         //System.out.println("here");
                     }
+                    communication.clearPort();
                     System.out.println(answers);
                     frameMP.evaluateAndDisplay(answers);
                     executor.schedule(new Runnable() {
