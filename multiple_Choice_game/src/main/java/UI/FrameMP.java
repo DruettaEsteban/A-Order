@@ -5,12 +5,14 @@ import javafx.animation.*;
 import javafx.application.Application;
 import javafx.application.Platform;
 import javafx.collections.ObservableList;
+import javafx.event.EventHandler;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.geometry.Rectangle2D;
 import javafx.scene.Scene;
 import javafx.scene.control.Label;
 import javafx.scene.input.KeyCode;
+import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
@@ -20,8 +22,7 @@ import javafx.scene.text.FontWeight;
 import javafx.stage.Screen;
 import javafx.stage.Stage;
 import javafx.util.Duration;
-import javafx.scene.input.KeyEvent;
-import javafx.event.EventHandler;
+
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.LinkedList;
@@ -213,21 +214,11 @@ public class FrameMP extends Application{
     }
 
     public void turnOptionsWhite(){
-        turnWhite(Answers.A);
-        turnWhite(Answers.B);
-        turnWhite(Answers.C);
-        turnWhite(Answers.D);
-    }
-
-
-    private void turnWhite(Answers answer){
-
-        Platform.runLater(()->{
-            options.forEach(option -> option.setStyle("-fx-background-color: white; -fx-border-color: black;  -fx-border-width: 2; -fx-border-style: solid inside; -fx-border-radius: 50;"));
-        });
-
+        options.forEach(option -> option.setStyle("-fx-background-color: white; -fx-background-radius: 50 50 50 50; -fx-border-color: black;  -fx-border-width: 2; -fx-border-style: solid inside; -fx-border-radius: 50;"));
 
     }
+
+
 
     private void turnGreen(Answers answer){
 

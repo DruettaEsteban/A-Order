@@ -4,6 +4,7 @@ import IO.ArduinoCommunication;
 import IO.AsyncAudioPlayer;
 import IO.QuestionsFactory;
 import javafx.application.Platform;
+
 import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
@@ -38,25 +39,22 @@ public class Controller {
 
             ScheduledThreadPoolExecutor executor = new ScheduledThreadPoolExecutor(1);
 
-            executor.schedule(() -> {
+            executor.schedule(() -> Platform.runLater(()->{
 
-                Platform.runLater(()->{
+                Answers answers = null;
+                while (answers == null){
+                    answers = communication.readPort();
 
-                    Answers answers = null;
-                    while (answers == null){
-                        answers = communication.readPort();
+                }
+                System.out.println(answers);
+                boolean isCorrect = frameMP.isCorrect(answers);
+                frameMP.evaluateAndDisplay(answers, ()-> asyncAudioPlayer.playRandomAudio(isCorrect));
+                executor.schedule(() -> {
+                    Controller.letTheGameBegin(frameMP, questionsFactory, communication);
+                    communication.clearPort();
+                },20000, TimeUnit.MILLISECONDS);
 
-                    }
-                    System.out.println(answers);
-                    boolean isCorrect = frameMP.isCorrect(answers);
-                    frameMP.evaluateAndDisplay(answers, ()-> asyncAudioPlayer.playRandomAudio(isCorrect));
-                    executor.schedule(() -> {
-                        Controller.letTheGameBegin(frameMP, questionsFactory, communication);
-                        communication.clearPort();
-                    },20000, TimeUnit.MILLISECONDS);
-
-                });
-            },5000, TimeUnit.MILLISECONDS);
+            }),5000, TimeUnit.MILLISECONDS);
 
         });
         gameCycle.start();
