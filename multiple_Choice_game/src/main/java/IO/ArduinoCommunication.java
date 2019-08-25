@@ -3,7 +3,6 @@ package IO;
 import UI.Answers;
 import com.fazecast.jSerialComm.SerialPort;
 
-import java.io.IOException;
 import java.util.Scanner;
 
 public final class ArduinoCommunication {

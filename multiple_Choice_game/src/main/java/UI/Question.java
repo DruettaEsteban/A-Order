@@ -17,7 +17,7 @@ public class Question {
         return options;
     }
 
-    public Answers getAnswers() {
+    public Answers getAnswer() {
         return answers;
     }
 

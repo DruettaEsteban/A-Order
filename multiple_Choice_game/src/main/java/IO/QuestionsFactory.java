@@ -2,7 +2,6 @@ package IO;
 
 import java.io.File;
 import java.io.IOException;
-import java.sql.SQLOutput;
 import java.util.*;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -28,17 +27,29 @@ public class QuestionsFactory {
     private Document document;
     private Element root;
 
+    private static String fileLocation;
+
     private static QuestionsFactory instance;
 
     public static QuestionsFactory newInstance(){
         if(instance == null) {
-            instance = new QuestionsFactory();
+            instance = new QuestionsFactory(fileLocation);
         }
         return instance;
     }
 
-    private QuestionsFactory(){
-        LOCATION = new File("C:\\Users\\Usuario\\Desktop\\test.xml");
+    public static QuestionsFactory newInstance(String fileLocation){
+        if(instance == null) {
+            QuestionsFactory.fileLocation = fileLocation;
+            instance = new QuestionsFactory(fileLocation);
+        }
+        return instance;
+    }
+
+
+    private QuestionsFactory(String fileLocation){
+        LOCATION = new File(fileLocation);
+        LOCATION.getParentFile().mkdirs();
         try {
             DocumentBuilderFactory documentBuilderFactory = DocumentBuilderFactory.newInstance();
             DocumentBuilder documentBuilder = documentBuilderFactory.newDocumentBuilder();
@@ -93,6 +104,7 @@ public class QuestionsFactory {
         }
     }
 
+
     public void addQuestion(Question question){
         //Adds new question to the buffer
         questions.add(question);
@@ -127,7 +139,7 @@ public class QuestionsFactory {
 
         //ANSWER
         Element correctAnswer = document.createElement("answer");
-        correctAnswer.appendChild(document.createTextNode(String.valueOf((question.getAnswers().getAnswer()))));
+        correctAnswer.appendChild(document.createTextNode(String.valueOf((question.getAnswer().getAnswer()))));
         questionMarker.appendChild(correctAnswer);
         //Add to root
         root.appendChild(questionMarker);

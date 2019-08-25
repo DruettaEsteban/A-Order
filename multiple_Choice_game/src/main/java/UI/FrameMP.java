@@ -334,10 +334,14 @@ public class FrameMP extends Application{
         timeline.play();
     }
 
+    public boolean isCorrect(Answers userResponse){
+        return (userResponse == currentQuestion.getAnswer());
+    }
 
-    public void evaluateAndDisplay(Answers userResponse){
+
+    public void evaluateAndDisplay(Answers userResponse, Runnable resultAction){
         if(canEvaluate()){
-            Answers correct = currentQuestion.getAnswers();
+            Answers correct = currentQuestion.getAnswer();
             options.get(userResponse.getAnswer()).setStyle("-fx-border-color: yellow;  -fx-border-width: 8; -fx-border-style: solid inside; -fx-border-radius: 50;");
 
             Answers[] representationArray= new Answers[]{Answers.A,Answers.B, Answers.C, Answers.D};
@@ -383,6 +387,7 @@ public class FrameMP extends Application{
             executorService.schedule(() -> {
                 simpleTreatment.treatWrong(wrong);
                 simpleTreatment.treatRight(correct);
+                executorService.schedule(resultAction::run, (long) (this.RESIZE_TIME_MILLIS*1.2),TimeUnit.MILLISECONDS);
             }, 10, TimeUnit.SECONDS);
 
 
