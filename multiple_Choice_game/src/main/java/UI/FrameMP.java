@@ -43,14 +43,20 @@ public class FrameMP extends Application{
     private final int FADE_TIME_MILLIS = 1000;
     private final int RESIZE_TIME_MILLIS = 1000;
     private final int FADE_COLOR_TIME_MILLIS = 1000;
+    private final int COUNTDOWN_RIGHT_MARGIN = (int) getPercentageWidth(10);
+    private final int COUNTDOWN_TOP_MARGIN = (int) getPercentageHeight(10);
+    private final int COUNTDOWN_TIME = 21;
+
+
     private Label optionA, optionB, optionC, optionD, question;
+    private CountdownLabel  countdownLabel;
     private LinkedList<Label> options;
     private VBox answersContainer;
     private VBox questionContainer;
 
     private Question currentQuestion;
 
-    public boolean canEvaluate(){
+    private boolean canEvaluate(){
         return (currentQuestion != null);
     }
 
@@ -66,7 +72,6 @@ public class FrameMP extends Application{
 
         options.forEach(e -> e.setWrapText(true));
         options.forEach(e -> e.setFont(Font.font("verdana", FontWeight.BOLD, FontPosture.REGULAR,20)));
-
 
         answersContainer = new VBox();
         answersContainer.setSpacing(ANSWERS_SEPARATION);
@@ -94,7 +99,7 @@ public class FrameMP extends Application{
         question.setFont(Font.font("verdana", FontWeight.BOLD, FontPosture.REGULAR,30));
         question.setMaxSize(QUESTION_WIDTH*2, QUESTION_HEIGHT*2);
         question.setMinSize(QUESTION_WIDTH*2, QUESTION_HEIGHT*2);
-        question.setPrefSize(QUESTION_WIDTH*2, QUESTION_HEIGHT*2);
+        question.setPrefSize(QUESTION_WIDTH*2, QUESTION_HEIGHT* 2);
         question.setWrapText(true);
         question.setAlignment(Pos.CENTER);
 
@@ -102,7 +107,14 @@ public class FrameMP extends Application{
         StackPane mainContainer = new StackPane();
         mainContainer.getChildren().addAll(questionContainer, answersContainer);
 
+        //EXPERIMENTAL
 
+        countdownLabel = new CountdownLabel(COUNTDOWN_TIME);
+        countdownLabel.setStyle( "-fx-padding: 30; -fx-background-color: yellow; -fx-background-radius: 50; ");
+        countdownLabel.setFont(Font.font("arial", FontWeight.NORMAL, FontPosture.REGULAR, 40));
+        mainContainer.setAlignment(Pos.TOP_RIGHT);
+        StackPane.setMargin(countdownLabel, new Insets(COUNTDOWN_TOP_MARGIN, COUNTDOWN_RIGHT_MARGIN, 0 , 0));
+        mainContainer.getChildren().add(countdownLabel);
 
         Scene scene = new Scene(mainContainer);
 
@@ -133,7 +145,24 @@ public class FrameMP extends Application{
 
     }
 
-    public static boolean isAddingQuestions = false;
+    public void startCountdown(){
+        countdownLabel.resetCounter();
+        countdownLabel.startCountdown();
+    }
+
+    public boolean isTimeOver(){
+        return this.countdownLabel.remainingTime().equals(Duration.ZERO);
+    }
+
+    public long getMillisRemainingTime(){ return (long) this.countdownLabel.remainingTime().toMillis(); }
+
+    public void stopCounter(){ this.countdownLabel.stopTimer();}
+
+    public int getCountdownMaxTime(){
+        return this.COUNTDOWN_TIME;
+    }
+
+    private static boolean isAddingQuestions = false;
 
     public static void main(String[] args){
         launch();
@@ -170,10 +199,8 @@ public class FrameMP extends Application{
         fadeOutQuestion();
         ScheduledThreadPoolExecutor executor = new ScheduledThreadPoolExecutor(1);
         executor.schedule(() -> {
-            Platform.runLater(()->{
-                question.setText(newQuestion.getQuestion());
-                fadeInQuestion();
-            });
+            Platform.runLater(()->{question.setText(newQuestion.getQuestion());});
+            fadeInQuestion();
 
         },FADE_TIME_MILLIS, TimeUnit.MILLISECONDS);
     }
@@ -184,9 +211,15 @@ public class FrameMP extends Application{
         executor.schedule(() -> Platform.runLater(()->{
             turnOptionsWhite();
             for (int i = 0; i < newOptions.getOptions().size(); i++) {
-                options.get(i).setText(newOptions.getOptions().get(i));
+                int finalI = i;
+                Platform.runLater(()->{
+                    options.get(finalI).setText(newOptions.getOptions().get(finalI));
+                    System.out.println("option " + options.get(finalI));
+                });
+
             }
             fadeInOptions();
+
         }), FADE_TIME_MILLIS, TimeUnit.MILLISECONDS);
     }
 
@@ -196,25 +229,30 @@ public class FrameMP extends Application{
             changeOptions(newQuestion);
             this.currentQuestion = newQuestion;
         }
-
     }
 
 
     private void resizeTransition(Answers a){
-        ScaleTransition transition = new ScaleTransition();
-        transition.setDuration(Duration.millis(RESIZE_TIME_MILLIS));
-        transition.setNode(options.get(a.getAnswer()));
-        transition.setFromX(1);
-        transition.setFromY(1);
-        transition.setToX(0.1);
-        transition.setToY(0.1);
-        transition.setCycleCount(2);
-        transition.setAutoReverse(true);
-        transition.play();
+        Platform.runLater(()->{
+            ScaleTransition transition = new ScaleTransition();
+            transition.setDuration(Duration.millis(RESIZE_TIME_MILLIS));
+            transition.setNode(options.get(a.getAnswer()));
+            transition.setFromX(1);
+            transition.setFromY(1);
+            transition.setToX(0.1);
+            transition.setToY(0.1);
+            transition.setCycleCount(2);
+            transition.setAutoReverse(true);
+            transition.play();
+
+        });
+
     }
 
-    public void turnOptionsWhite(){
-        options.forEach(option -> option.setStyle("-fx-background-color: white; -fx-background-radius: 50 50 50 50; -fx-border-color: black;  -fx-border-width: 2; -fx-border-style: solid inside; -fx-border-radius: 50;"));
+    private void turnOptionsWhite(){
+        Platform.runLater(()->{
+            options.forEach(option -> option.setStyle("-fx-background-color: white; -fx-background-radius: 50 50 50 50; -fx-border-color: black;  -fx-border-width: 2; -fx-border-style: solid inside; -fx-border-radius: 50;"));
+        });
 
     }
 
@@ -223,53 +261,60 @@ public class FrameMP extends Application{
     private void turnGreen(Answers answer){
 
         int duration = FADE_COLOR_TIME_MILLIS;
+        Platform.runLater(()->{
+            FadeTransition ft = new FadeTransition(Duration.millis(duration), options.get(answer.getAnswer()));
+            ft.setFromValue(1);
+            ft.setToValue(0.4);
+            ft.setCycleCount(2);
+            ft.setAutoReverse(true);
+            ft.play();
 
-        FadeTransition ft = new FadeTransition(Duration.millis(duration), options.get(answer.getAnswer()));
-        ft.setFromValue(1);
-        ft.setToValue(0.4);
-        ft.setCycleCount(2);
-        ft.setAutoReverse(true);
-        ft.play();
 
-        Thread turnGreen = new Thread(() -> {
-            try {
-                Thread.sleep(duration);
-                options.get(answer.getAnswer()).setStyle("-fx-background-color: green; -fx-background-radius: 50 50 50 50;"+"-fx-padding: "+ ANSWER_HEIGHT + " " + ANSWER_WIDTH + " " + ANSWER_HEIGHT + " "+ ANSWER_WIDTH+"; -fx-border-color: black;  -fx-border-width: 2; -fx-border-style: solid inside; -fx-border-radius: 50;");
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
+
+            Thread turnGreen = new Thread(() -> {
+                try {
+                    Thread.sleep(duration);
+                        options.get(answer.getAnswer()).setStyle("-fx-background-color: green; -fx-background-radius: 50 50 50 50;"+"-fx-padding: "+ ANSWER_HEIGHT + " " + ANSWER_WIDTH + " " + ANSWER_HEIGHT + " "+ ANSWER_WIDTH+"; -fx-border-color: black;  -fx-border-width: 2; -fx-border-style: solid inside; -fx-border-radius: 50;");
+
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+            });
+            turnGreen.start();
         });
-        turnGreen.start();
     }
 
-    public void fadeOutOption(Answers answer){
-        int duration = FADE_TIME_MILLIS;
-        FadeTransition ft = new FadeTransition(Duration.millis(duration), options.get(answer.getAnswer()));
-        ft.setFromValue(1);
-        ft.setToValue(0.1);
-        ft.setCycleCount(1);
-        ft.setAutoReverse(false);
-        ft.play();
+    private void fadeOutOption(Answers answer){
+        Platform.runLater(()->{
+            FadeTransition ft = new FadeTransition(Duration.millis(FADE_TIME_MILLIS), options.get(answer.getAnswer()));
+            ft.setFromValue(1);
+            ft.setToValue(0.1);
+            ft.setCycleCount(1);
+            ft.setAutoReverse(false);
+            ft.play();
+        });
     }
 
-    public void fadeOutOptions(){
+    private void fadeOutOptions(){
         fadeOutOption(Answers.A);
         fadeOutOption(Answers.B);
         fadeOutOption(Answers.C);
         fadeOutOption(Answers.D);
     }
 
-    public void fadeInOption(Answers answer){
-        int duration = FADE_TIME_MILLIS;
-        FadeTransition ft = new FadeTransition(Duration.millis(duration), options.get(answer.getAnswer()));
-        ft.setFromValue(0.1);
-        ft.setToValue(1.0);
-        ft.setCycleCount(1);
-        ft.setAutoReverse(false);
-        ft.play();
+
+    private void fadeInOption(Answers answer){
+        Platform.runLater(()->{
+            FadeTransition ft = new FadeTransition(Duration.millis(FADE_TIME_MILLIS), options.get(answer.getAnswer()));
+            ft.setFromValue(0.1);
+            ft.setToValue(1.0);
+            ft.setCycleCount(1);
+            ft.setAutoReverse(false);
+            ft.play();
+        });
     }
 
-    public void fadeInOptions(){
+    private void fadeInOptions(){
         fadeInOption(Answers.A);
         fadeInOption(Answers.B);
         fadeInOption(Answers.C);
@@ -280,49 +325,56 @@ public class FrameMP extends Application{
 
         int duration = FADE_COLOR_TIME_MILLIS;
 
-        FadeTransition ft = new FadeTransition(Duration.millis(duration), options.get(answer.getAnswer()));
-        ft.setFromValue(1);
-        ft.setToValue(0.4);
-        ft.setCycleCount(2);
-        ft.setAutoReverse(true);
-        ft.play();
+        Platform.runLater(()->{
 
-        Thread turnRed = new Thread(() -> {
-            try {
-                Thread.sleep(duration);
-                options.get(answer.getAnswer()).setStyle("-fx-background-color: red; -fx-background-radius: 50 50 50 50;"+"; -fx-border-color: black;  -fx-border-width: 2; -fx-border-style: solid inside; -fx-border-radius: 50;");
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
+            FadeTransition ft = new FadeTransition(Duration.millis(duration), options.get(answer.getAnswer()));
+            ft.setFromValue(1);
+            ft.setToValue(0.4);
+            ft.setCycleCount(2);
+            ft.setAutoReverse(true);
+            ft.play();
+
+            Thread turnRed = new Thread(() -> {
+                try {
+                    Thread.sleep(duration);
+                    options.get(answer.getAnswer()).setStyle("-fx-background-color: red; -fx-background-radius: 50 50 50 50;"+"; -fx-border-color: black;  -fx-border-width: 2; -fx-border-style: solid inside; -fx-border-radius: 50;");
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+            });
+            turnRed.start();
+
         });
-        turnRed.start();
+
     }
 
-    public void fadeOutQuestion(){
-        int duration = FADE_TIME_MILLIS;
+    private void fadeOutQuestion(){
 
         Color fromColor = Color.BLACK;
         Color toColor = Color.TRANSPARENT;
+        Platform.runLater(()->{
+            Timeline timeline = new Timeline(
+                    new KeyFrame(Duration.ZERO, new KeyValue(question.textFillProperty(), fromColor)),
+                    new KeyFrame(Duration.millis(FADE_TIME_MILLIS), new KeyValue(question.textFillProperty(), toColor))
+            );
+            timeline.play();
+        });
 
-        Timeline timeline = new Timeline(
-                new KeyFrame(Duration.ZERO, new KeyValue(question.textFillProperty(), fromColor)),
-                new KeyFrame(Duration.millis(duration), new KeyValue(question.textFillProperty(), toColor))
-        );
-        timeline.play();
     }
 
 
-    public void fadeInQuestion(){
-        int duration = FADE_TIME_MILLIS;
+    private void fadeInQuestion(){
 
         Color fromColor = Color.TRANSPARENT;
         Color toColor = Color.BLACK;
+        Platform.runLater(()->{
+            Timeline timeline = new Timeline(
+                    new KeyFrame(Duration.ZERO, new KeyValue(question.textFillProperty(), fromColor)),
+                    new KeyFrame(Duration.millis(FADE_TIME_MILLIS), new KeyValue(question.textFillProperty(), toColor))
+            );
+            timeline.play();
+        });
 
-        Timeline timeline = new Timeline(
-                new KeyFrame(Duration.ZERO, new KeyValue(question.textFillProperty(), fromColor)),
-                new KeyFrame(Duration.millis(duration), new KeyValue(question.textFillProperty(), toColor))
-        );
-        timeline.play();
     }
 
     public boolean isCorrect(Answers userResponse){
@@ -331,67 +383,79 @@ public class FrameMP extends Application{
 
 
     public void evaluateAndDisplay(Answers userResponse, Runnable resultAction){
+
         if(canEvaluate()){
             Answers correct = currentQuestion.getAnswer();
-            options.get(userResponse.getAnswer()).setStyle("-fx-border-color: yellow;  -fx-border-width: 8; -fx-border-style: solid inside; -fx-border-radius: 50;");
-
-            Answers[] representationArray= new Answers[]{Answers.A,Answers.B, Answers.C, Answers.D};
-            final LinkedList<Answers> completelyIncorrect = new LinkedList<>(Arrays.asList(representationArray));
-            final LinkedList<Answers> lastRepresentation = new LinkedList<>(Arrays.asList(representationArray));
-
-            completelyIncorrect.remove(correct);
-            completelyIncorrect.remove(userResponse);
-            completelyIncorrect.forEach(lastRepresentation::remove);
-
-
-            final SimpleTreatment simpleTreatment = new SimpleTreatment();
-
-            final ScheduledThreadPoolExecutor executorService = new ScheduledThreadPoolExecutor(3);
-
-            Answers firstDeleted = completelyIncorrect.get(generateRandom(0, 1));
-            completelyIncorrect.remove(firstDeleted);
-
-
-            executorService.schedule(() -> {
-                simpleTreatment.treatWrong(firstDeleted);
-
-            }, 2, TimeUnit.SECONDS);
-
-
-            Answers secondDeleted = completelyIncorrect.pop();
-            executorService.schedule(() -> {
-
-                simpleTreatment.treatWrong(secondDeleted);
-
-            }, 5, TimeUnit.SECONDS);
-
-
-            Answers wrong;
-            if(completelyIncorrect.size() > 0){
-                wrong = completelyIncorrect.pop();
-                lastRepresentation.add(wrong);
-            }else {
-                wrong = (lastRepresentation.get(0).equals(correct)) ? lastRepresentation.get(1) : lastRepresentation.get(0);
+            String answerColor;
+            switch (userResponse.getAnswer()){
+                case 0:
+                    answerColor = "-fx-border-color: yellow;";
+                    break;
+                case 1:
+                    answerColor = "-fx-border-color: purple;";
+                    break;
+                case 2:
+                    answerColor = "-fx-border-color: orange;";
+                    break;
+                case 3:
+                default:
+                    answerColor = "-fx-border-color: blue;";
+                    break;
             }
 
+            Platform.runLater(()->{
+                options.get(userResponse.getAnswer()).setStyle(answerColor+"-fx-border-width: 8; -fx-border-style: solid inside; -fx-border-radius: 50;-fx-background-color: white; -fx-background-radius: 50 50 50 50;");
 
-            executorService.schedule(() -> {
-                simpleTreatment.treatWrong(wrong);
-                simpleTreatment.treatRight(correct);
-                executorService.schedule(resultAction::run, (long) (this.RESIZE_TIME_MILLIS*1.2),TimeUnit.MILLISECONDS);
-            }, 10, TimeUnit.SECONDS);
+                Answers[] representationArray= new Answers[]{Answers.A,Answers.B, Answers.C, Answers.D};
+                final LinkedList<Answers> completelyIncorrect = new LinkedList<>(Arrays.asList(representationArray));
+                final LinkedList<Answers> lastRepresentation = new LinkedList<>(Arrays.asList(representationArray));
 
+                completelyIncorrect.remove(correct);
+                completelyIncorrect.remove(userResponse);
+                completelyIncorrect.forEach(lastRepresentation::remove);
+
+
+                final SimpleTreatment simpleTreatment = new SimpleTreatment();
+
+                final ScheduledThreadPoolExecutor executorService = new ScheduledThreadPoolExecutor(3);
+
+                Answers firstDeleted = completelyIncorrect.get(generateRandom(0, 1));
+                completelyIncorrect.remove(firstDeleted);
+
+
+                executorService.schedule(() -> simpleTreatment.treatWrong(firstDeleted), 2, TimeUnit.SECONDS);
+
+
+                Answers secondDeleted = completelyIncorrect.pop();
+                executorService.schedule(() -> simpleTreatment.treatWrong(secondDeleted), 5, TimeUnit.SECONDS);
+
+
+                Answers wrong;
+                if(completelyIncorrect.size() > 0){
+                    wrong = completelyIncorrect.pop();
+                    lastRepresentation.add(wrong);
+                }else {
+                    wrong = (lastRepresentation.get(0).equals(correct)) ? lastRepresentation.get(1) : lastRepresentation.get(0);
+                }
+
+
+                executorService.schedule(() -> {
+                    simpleTreatment.treatWrong(wrong);
+                    simpleTreatment.treatRight(correct);
+                    executorService.schedule(resultAction, (long) (this.RESIZE_TIME_MILLIS*1.2),TimeUnit.MILLISECONDS);
+                }, 10, TimeUnit.SECONDS);
+            });
 
         }
     }
 
     class SimpleTreatment{
-        public void treatWrong(Answers answer){
+        void treatWrong(Answers answer){
             resizeTransition(answer);
             turnRed(answer);
         }
 
-        public void treatRight(Answers answer){
+        void treatRight(Answers answer){
             resizeTransition(answer);
             turnGreen(answer);
         }

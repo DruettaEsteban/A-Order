@@ -7,7 +7,7 @@ public enum Answers {
         this.answer = answer;
     }
 
-    private int answer;
+    private final int answer;
 
     public int getAnswer(){
         return answer;

@@ -7,7 +7,7 @@ import java.util.Scanner;
 
 public final class ArduinoCommunication {
 
-    SerialPort sp;
+    private final SerialPort sp;
 
     public ArduinoCommunication(String port){
         sp = SerialPort.getCommPort(port);

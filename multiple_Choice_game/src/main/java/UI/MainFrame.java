@@ -3,8 +3,6 @@ package UI;
 import javafx.animation.ScaleTransition;
 import javafx.animation.TranslateTransition;
 import javafx.application.Application;
-import javafx.collections.ObservableList;
-import javafx.event.Event;
 import javafx.event.EventHandler;
 import javafx.scene.Group;
 import javafx.scene.Scene;
@@ -76,14 +74,7 @@ public class MainFrame extends Application {
         translateTransition.play();
 
         //HANDLE CLICK EVENT
-        EventHandler<MouseEvent> eventHandler = new EventHandler<MouseEvent>() {
-
-            @Override
-            public void handle(MouseEvent event) {
-                System.out.println("MOUSE CLICKED");
-            }
-
-        };
+        EventHandler<MouseEvent> eventHandler = event -> System.out.println("MOUSE CLICKED");
         //ADDING EVENT
         question.addEventFilter(MouseEvent.MOUSE_CLICKED, eventHandler);
 

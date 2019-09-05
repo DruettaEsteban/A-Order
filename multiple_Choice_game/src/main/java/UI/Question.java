@@ -3,13 +3,13 @@ package UI;
 import java.util.LinkedList;
 
 public class Question {
-    private LinkedList<String> options;
-    private Answers answers;
-    private String question;
+    private final LinkedList<String> options;
+    private final Answers answer;
+    private final String question;
 
-    public Question(LinkedList options, Answers answer, String question){
+    public Question(LinkedList<String> options, Answers answer, String question){
         this.options = options;
-        this.answers = answer;
+        this.answer = answer;
         this.question = question;
     }
 
@@ -18,10 +18,21 @@ public class Question {
     }
 
     public Answers getAnswer() {
-        return answers;
+        return answer;
     }
 
     public String getQuestion() {
         return question;
+    }
+
+
+    public String toString(){
+        return "Question: " + question+ "\n" +
+                "First Question: " + options.get(0) + "\n" +
+                "Second Question: " + options.get(1) + "\n" +
+                "Third Question: " + options.get(2) + "\n" +
+                "Forth Question: " + options.get(3) + "\n" +
+                "True Answer: " + answer.toString() + "\n";
+
     }
 }

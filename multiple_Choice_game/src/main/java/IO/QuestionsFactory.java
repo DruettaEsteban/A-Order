@@ -1,18 +1,5 @@
 package IO;
 
-import java.io.File;
-import java.io.IOException;
-import java.util.*;
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.parsers.ParserConfigurationException;
-import javax.xml.transform.Transformer;
-import javax.xml.transform.TransformerConfigurationException;
-import javax.xml.transform.TransformerException;
-import javax.xml.transform.TransformerFactory;
-import javax.xml.transform.dom.DOMSource;
-import javax.xml.transform.stream.StreamResult;
-
 import UI.Answers;
 import UI.Question;
 import org.w3c.dom.Document;
@@ -21,8 +8,23 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
 
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.transform.Transformer;
+import javax.xml.transform.TransformerException;
+import javax.xml.transform.TransformerFactory;
+import javax.xml.transform.dom.DOMSource;
+import javax.xml.transform.stream.StreamResult;
+import java.io.File;
+import java.io.IOException;
+import java.util.Collections;
+import java.util.LinkedList;
+import java.util.Random;
+import java.util.Scanner;
+
 public class QuestionsFactory {
-    LinkedList<Question> questions = new LinkedList<>();
+    private final LinkedList<Question> questions = new LinkedList<>();
     private final File LOCATION;
     private Document document;
     private Element root;
@@ -155,8 +157,6 @@ public class QuestionsFactory {
             DOMSource domSource = new DOMSource(document);
             StreamResult streamResult = new StreamResult(LOCATION);
             transformer.transform(domSource, streamResult);
-        } catch (TransformerConfigurationException e) {
-            e.printStackTrace();
         } catch (TransformerException e) {
             e.printStackTrace();
         }
@@ -188,7 +188,7 @@ public class QuestionsFactory {
                 String D = scanner.nextLine();
                 System.out.print("Cual es la respuesta? (A, B, C o D)");
                 String answer = scanner.nextLine();
-                Answers answersRectified = null;
+                Answers answersRectified;
                 switch (answer) {
                     case "A":
                     case "a":
