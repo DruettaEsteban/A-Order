@@ -154,13 +154,13 @@ public class FrameMP extends Application{
         return this.countdownLabel.remainingTime().equals(Duration.ZERO);
     }
 
-    public long getMillisRemainingTime(){ return (long) this.countdownLabel.remainingTime().toMillis(); }
+    //public long getMillisRemainingTime(){ return (long) this.countdownLabel.remainingTime().toMillis(); }
 
     public void stopCounter(){ this.countdownLabel.stopTimer();}
 
-    public int getCountdownMaxTime(){
+    /*public int getCountdownMaxTime(){
         return this.COUNTDOWN_TIME;
-    }
+    }*/
 
     private static boolean isAddingQuestions = false;
 
@@ -208,7 +208,7 @@ public class FrameMP extends Application{
     private void changeOptions(Question newOptions){
         fadeOutOptions();
         ScheduledThreadPoolExecutor executor = new ScheduledThreadPoolExecutor(1);
-        executor.schedule(() -> Platform.runLater(()->{
+        executor.schedule(() -> {
             turnOptionsWhite();
             for (int i = 0; i < newOptions.getOptions().size(); i++) {
                 int finalI = i;
@@ -220,7 +220,7 @@ public class FrameMP extends Application{
             }
             fadeInOptions();
 
-        }), FADE_TIME_MILLIS, TimeUnit.MILLISECONDS);
+        }, FADE_TIME_MILLIS, TimeUnit.MILLISECONDS);
     }
 
     public void changeQuestionAndOptions(Question newQuestion){
@@ -268,20 +268,19 @@ public class FrameMP extends Application{
             ft.setCycleCount(2);
             ft.setAutoReverse(true);
             ft.play();
-
-
-
-            Thread turnGreen = new Thread(() -> {
-                try {
-                    Thread.sleep(duration);
-                        options.get(answer.getAnswer()).setStyle("-fx-background-color: green; -fx-background-radius: 50 50 50 50;"+"-fx-padding: "+ ANSWER_HEIGHT + " " + ANSWER_WIDTH + " " + ANSWER_HEIGHT + " "+ ANSWER_WIDTH+"; -fx-border-color: black;  -fx-border-width: 2; -fx-border-style: solid inside; -fx-border-radius: 50;");
-
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                }
-            });
-            turnGreen.start();
         });
+
+        Thread turnGreen = new Thread(() -> {
+            try {
+                Thread.sleep(duration);
+                    Platform.runLater(()->options.get(answer.getAnswer()).setStyle("-fx-background-color: green; -fx-background-radius: 50 50 50 50;"+"-fx-padding: "+ ANSWER_HEIGHT + " " + ANSWER_WIDTH + " " + ANSWER_HEIGHT + " "+ ANSWER_WIDTH+"; -fx-border-color: black;  -fx-border-width: 2; -fx-border-style: solid inside; -fx-border-radius: 50;"));
+
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+        });
+        turnGreen.start();
+
     }
 
     private void fadeOutOption(Answers answer){
@@ -333,18 +332,17 @@ public class FrameMP extends Application{
             ft.setCycleCount(2);
             ft.setAutoReverse(true);
             ft.play();
+        });
 
             Thread turnRed = new Thread(() -> {
                 try {
                     Thread.sleep(duration);
-                    options.get(answer.getAnswer()).setStyle("-fx-background-color: red; -fx-background-radius: 50 50 50 50;"+"; -fx-border-color: black;  -fx-border-width: 2; -fx-border-style: solid inside; -fx-border-radius: 50;");
+                    Platform.runLater(()->options.get(answer.getAnswer()).setStyle("-fx-background-color: red; -fx-background-radius: 50 50 50 50;"+"; -fx-border-color: black;  -fx-border-width: 2; -fx-border-style: solid inside; -fx-border-radius: 50;"));
                 } catch (InterruptedException e) {
                     e.printStackTrace();
                 }
             });
             turnRed.start();
-
-        });
 
     }
 
@@ -403,48 +401,48 @@ public class FrameMP extends Application{
                     break;
             }
 
-            Platform.runLater(()->{
-                options.get(userResponse.getAnswer()).setStyle(answerColor+"-fx-border-width: 8; -fx-border-style: solid inside; -fx-border-radius: 50;-fx-background-color: white; -fx-background-radius: 50 50 50 50;");
 
-                Answers[] representationArray= new Answers[]{Answers.A,Answers.B, Answers.C, Answers.D};
-                final LinkedList<Answers> completelyIncorrect = new LinkedList<>(Arrays.asList(representationArray));
-                final LinkedList<Answers> lastRepresentation = new LinkedList<>(Arrays.asList(representationArray));
+            Platform.runLater(()->options.get(userResponse.getAnswer()).setStyle(answerColor+"-fx-border-width: 8; -fx-border-style: solid inside; -fx-border-radius: 50;-fx-background-color: white; -fx-background-radius: 50 50 50 50;"));
 
-                completelyIncorrect.remove(correct);
-                completelyIncorrect.remove(userResponse);
-                completelyIncorrect.forEach(lastRepresentation::remove);
+            Answers[] representationArray= new Answers[]{Answers.A,Answers.B, Answers.C, Answers.D};
+            final LinkedList<Answers> completelyIncorrect = new LinkedList<>(Arrays.asList(representationArray));
+            final LinkedList<Answers> lastRepresentation = new LinkedList<>(Arrays.asList(representationArray));
 
-
-                final SimpleTreatment simpleTreatment = new SimpleTreatment();
-
-                final ScheduledThreadPoolExecutor executorService = new ScheduledThreadPoolExecutor(3);
-
-                Answers firstDeleted = completelyIncorrect.get(generateRandom(0, 1));
-                completelyIncorrect.remove(firstDeleted);
+            completelyIncorrect.remove(correct);
+            completelyIncorrect.remove(userResponse);
+            completelyIncorrect.forEach(lastRepresentation::remove);
 
 
-                executorService.schedule(() -> simpleTreatment.treatWrong(firstDeleted), 2, TimeUnit.SECONDS);
+            final SimpleTreatment simpleTreatment = new SimpleTreatment();
+
+            final ScheduledThreadPoolExecutor executorService = new ScheduledThreadPoolExecutor(3);
+
+            Answers firstDeleted = completelyIncorrect.get(generateRandom(0, 1));
+            completelyIncorrect.remove(firstDeleted);
 
 
-                Answers secondDeleted = completelyIncorrect.pop();
-                executorService.schedule(() -> simpleTreatment.treatWrong(secondDeleted), 5, TimeUnit.SECONDS);
+            executorService.schedule(() -> Platform.runLater(()-> simpleTreatment.treatWrong(firstDeleted)), 2, TimeUnit.SECONDS);
 
 
-                Answers wrong;
-                if(completelyIncorrect.size() > 0){
-                    wrong = completelyIncorrect.pop();
-                    lastRepresentation.add(wrong);
-                }else {
-                    wrong = (lastRepresentation.get(0).equals(correct)) ? lastRepresentation.get(1) : lastRepresentation.get(0);
-                }
+            Answers secondDeleted = completelyIncorrect.pop();
+            executorService.schedule(() -> Platform.runLater(()->simpleTreatment.treatWrong(secondDeleted)), 5, TimeUnit.SECONDS);
 
 
-                executorService.schedule(() -> {
-                    simpleTreatment.treatWrong(wrong);
-                    simpleTreatment.treatRight(correct);
-                    executorService.schedule(resultAction, (long) (this.RESIZE_TIME_MILLIS*1.2),TimeUnit.MILLISECONDS);
-                }, 10, TimeUnit.SECONDS);
-            });
+            Answers wrong;
+            if(completelyIncorrect.size() > 0){
+                wrong = completelyIncorrect.pop();
+                lastRepresentation.add(wrong);
+            }else {
+                wrong = (lastRepresentation.get(0).equals(correct)) ? lastRepresentation.get(1) : lastRepresentation.get(0);
+            }
+
+
+            executorService.schedule(() -> {
+                simpleTreatment.treatWrong(wrong);
+                simpleTreatment.treatRight(correct);
+                executorService.schedule(resultAction, (long) (this.RESIZE_TIME_MILLIS*1.2),TimeUnit.MILLISECONDS);
+            }, 10, TimeUnit.SECONDS);
+
 
         }
     }

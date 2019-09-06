@@ -3,7 +3,6 @@ package UI;
 import IO.ArduinoCommunication;
 import IO.AsyncAudioPlayer;
 import IO.QuestionsFactory;
-import javafx.application.Platform;
 
 import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
@@ -33,45 +32,43 @@ class Controller {
 
     private static void letTheGameBegin(FrameMP frameMP, QuestionsFactory questionsFactory, ArduinoCommunication communication){
 
-        Thread gameCycle = new Thread(() -> {
+        frameMP.changeQuestionAndOptions(questionsFactory.getRandomQuestion());
 
-            frameMP.changeQuestionAndOptions(questionsFactory.getRandomQuestion());
+        ScheduledThreadPoolExecutor executor = new ScheduledThreadPoolExecutor(1);
 
-            ScheduledThreadPoolExecutor executor = new ScheduledThreadPoolExecutor(1);
+        executor.schedule(() -> {
 
-            executor.schedule(() -> Platform.runLater(()->{
 
-                Thread thread = new Thread(() -> {
-                    Answers answers = null;
-                    frameMP.startCountdown();
-                    boolean timeOver = false;
-                    while (answers == null){
-                        answers = communication.readPort();
-                        if (frameMP.isTimeOver()){
-                            timeOver = true;
-                            break;
-                        }
-                    }
-                    if(!timeOver) {
-                        System.out.println(answers);
-                        frameMP.stopCounter();
-                        boolean isCorrect = frameMP.isCorrect(answers);
-                        frameMP.evaluateAndDisplay(answers, ()-> asyncAudioPlayer.playRandomAudio(isCorrect));
-                        executor.schedule(() -> {
-                            Controller.letTheGameBegin(frameMP, questionsFactory, communication);
-                            communication.clearPort();
-                        },20000, TimeUnit.MILLISECONDS);
-                    } else {
-                        Controller.letTheGameBegin(frameMP, questionsFactory, communication);
-                    }
+            Answers answers = null;
+            frameMP.startCountdown();
+            boolean timeOver = false;
+            while (answers == null){
+                answers = communication.readPort();
+                if (frameMP.isTimeOver()){
+                    timeOver = true;
+                    break;
+                }
+            }
 
-                });
-               thread.start();
+            if(!timeOver) {
+                System.out.println(answers);
+                frameMP.stopCounter();
+                boolean isCorrect = frameMP.isCorrect(answers);
+                frameMP.evaluateAndDisplay(answers, ()-> asyncAudioPlayer.playRandomAudio(isCorrect));
+                executor.schedule(() -> {
+                    Controller.letTheGameBegin(frameMP, questionsFactory, communication);
+                    communication.clearPort();
 
-            }),2500, TimeUnit.MILLISECONDS);
+                },20000, TimeUnit.MILLISECONDS);
+            } else {
+                Controller.letTheGameBegin(frameMP, questionsFactory, communication);
+            }
 
-        });
-        gameCycle.start();
+
+
+        },2500, TimeUnit.MILLISECONDS);
+
+
     }
 
 }
