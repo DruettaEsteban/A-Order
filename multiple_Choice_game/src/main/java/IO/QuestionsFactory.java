@@ -46,6 +46,7 @@ public class QuestionsFactory {
             instance = new QuestionsFactory(fileLocation);
         }
         return instance;
+
     }
 
 
@@ -139,6 +140,11 @@ public class QuestionsFactory {
         D.appendChild(document.createTextNode(question.getOptions().get(Answers.D.getAnswer())));
         questionMarker.appendChild(D);
 
+        //IDENTIFIER
+        Element identifier = document.createElement("id");
+        identifier.appendChild(document.createTextNode(String.valueOf(question.getIDENTIFIER())));
+        questionMarker.appendChild(identifier);
+
         //ANSWER
         Element correctAnswer = document.createElement("answer");
         correctAnswer.appendChild(document.createTextNode(String.valueOf((question.getAnswer().getAnswer()))));
@@ -160,6 +166,7 @@ public class QuestionsFactory {
         } catch (TransformerException e) {
             e.printStackTrace();
         }
+
     }
 
     public Question getRandomQuestion(){

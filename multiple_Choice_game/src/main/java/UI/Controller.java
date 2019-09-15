@@ -34,8 +34,9 @@ class Controller {
 
         frameMP.changeQuestionAndOptions(questionsFactory.getRandomQuestion());
 
-        ScheduledThreadPoolExecutor executor = new ScheduledThreadPoolExecutor(1);
+        ScheduledThreadPoolExecutor executor = new ScheduledThreadPoolExecutor(2);
 
+        executor.schedule(frameMP::fillBar, 1000, TimeUnit.MILLISECONDS);
         executor.schedule(() -> {
 
 
@@ -46,6 +47,11 @@ class Controller {
                 answers = communication.readPort();
                 if (frameMP.isTimeOver()){
                     timeOver = true;
+                    try {
+                        Thread.sleep(10);
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
                     break;
                 }
             }

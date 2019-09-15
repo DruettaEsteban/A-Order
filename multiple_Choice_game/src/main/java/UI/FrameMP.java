@@ -36,7 +36,7 @@ public class FrameMP extends Application{
     private final double ANSWER_WIDTH = getPercentageWidth(45);
     private final double ANSWERS_SEPARATION = getPercentageHeight(5);
     private final double ANSWERS_BOTTOM_PADDING = getPercentageHeight(3);
-    private final double RESPONSE_QUESTION_TOP_MARGIN = getPercentageHeight(3);
+    private final double RESPONSE_QUESTION_TOP_MARGIN = getPercentageHeight(5);
     private final double QUESTION_HEIGHT = getPercentageHeight(10);
     private final double QUESTION_WIDTH = getPercentageWidth(45);
     private final double QUESTION_CONTAINER_SPACING = getPercentageWidth(0.2);
@@ -45,11 +45,13 @@ public class FrameMP extends Application{
     private final int FADE_COLOR_TIME_MILLIS = 1000;
     private final int COUNTDOWN_RIGHT_MARGIN = (int) getPercentageWidth(10);
     private final int COUNTDOWN_TOP_MARGIN = (int) getPercentageHeight(10);
-    private final int COUNTDOWN_TIME = 21;
+    private final int COUNTDOWN_BAR_RIGHT_MARGIN = (int) getPercentageWidth(0);
+    private final int COUNTDOWN_BAR_TOP_MARGIN = (int) getPercentageHeight(0);
+    private final int COUNTDOWN_TIME_MILLIS = 21000;
 
 
     private Label optionA, optionB, optionC, optionD, question;
-    private CountdownLabel  countdownLabel;
+    private TimeBar countdownBar;
     private LinkedList<Label> options;
     private VBox answersContainer;
     private VBox questionContainer;
@@ -60,6 +62,10 @@ public class FrameMP extends Application{
         return (currentQuestion != null);
     }
 
+
+    public void fillBar(){
+        countdownBar.fillBar();
+    }
 
     public void start(Stage primaryStage) {
         optionA = new Label();
@@ -108,13 +114,17 @@ public class FrameMP extends Application{
         mainContainer.getChildren().addAll(questionContainer, answersContainer);
 
         //EXPERIMENTAL
+        countdownBar = new TimeBar(COUNTDOWN_TIME_MILLIS);
+        mainContainer.setAlignment(Pos.TOP_CENTER);
+        StackPane.setMargin(countdownBar, new Insets(COUNTDOWN_BAR_TOP_MARGIN, COUNTDOWN_BAR_RIGHT_MARGIN, 0 , 0));
+        mainContainer.getChildren().add(countdownBar);
+        countdownBar.setPrefWidth(getPercentageWidth(100));
+        countdownBar.setMinWidth(getPercentageWidth(100));
+        countdownBar.setMaxWidth(getPercentageWidth(100));
+        countdownBar.setPrefHeight(getPercentageHeight(5));
+        countdownBar.progressProperty().setValue(0);
+        countdownBar.setStyle("-fx-bar-fill: green;");
 
-        countdownLabel = new CountdownLabel(COUNTDOWN_TIME);
-        countdownLabel.setStyle( "-fx-padding: 30; -fx-background-color: yellow; -fx-background-radius: 50; ");
-        countdownLabel.setFont(Font.font("arial", FontWeight.NORMAL, FontPosture.REGULAR, 40));
-        mainContainer.setAlignment(Pos.TOP_RIGHT);
-        StackPane.setMargin(countdownLabel, new Insets(COUNTDOWN_TOP_MARGIN, COUNTDOWN_RIGHT_MARGIN, 0 , 0));
-        mainContainer.getChildren().add(countdownLabel);
 
         Scene scene = new Scene(mainContainer);
 
@@ -142,21 +152,19 @@ public class FrameMP extends Application{
         };
 
         scene.addEventHandler(KeyEvent.KEY_PRESSED, eventHandler);
-
     }
 
     public void startCountdown(){
-        countdownLabel.resetCounter();
-        countdownLabel.startCountdown();
+        countdownBar.startCountdown();
     }
 
     public boolean isTimeOver(){
-        return this.countdownLabel.remainingTime().equals(Duration.ZERO);
+        return this.countdownBar.remainingTime().equals(Duration.ZERO);
     }
 
     //public long getMillisRemainingTime(){ return (long) this.countdownLabel.remainingTime().toMillis(); }
 
-    public void stopCounter(){ this.countdownLabel.stopTimer();}
+    public void stopCounter(){ this.countdownBar.stopCountdown();}
 
     /*public int getCountdownMaxTime(){
         return this.COUNTDOWN_TIME;
@@ -387,17 +395,17 @@ public class FrameMP extends Application{
             String answerColor;
             switch (userResponse.getAnswer()){
                 case 0:
-                    answerColor = "-fx-border-color: yellow;";
+                    answerColor = "-fx-border-color: blue;";
                     break;
                 case 1:
-                    answerColor = "-fx-border-color: purple;";
+                    answerColor = "-fx-border-color: black;";
                     break;
                 case 2:
-                    answerColor = "-fx-border-color: orange;";
+                    answerColor = "-fx-border-color: yellow;";
                     break;
                 case 3:
                 default:
-                    answerColor = "-fx-border-color: blue;";
+                    answerColor = "-fx-border-color: red;";
                     break;
             }
 
