@@ -22,6 +22,7 @@ import javafx.scene.text.FontWeight;
 import javafx.stage.Screen;
 import javafx.stage.Stage;
 import javafx.util.Duration;
+import stadistics.StatisticQuestionFile;
 
 import java.util.Arrays;
 import java.util.Collections;
@@ -56,7 +57,11 @@ public class FrameMP extends Application{
     private VBox answersContainer;
     private VBox questionContainer;
 
-    private Question currentQuestion;
+    public StatisticQuestionFile getCurrentQuestion() {
+        return currentQuestion;
+    }
+
+    private StatisticQuestionFile currentQuestion;
 
     private boolean canEvaluate(){
         return (currentQuestion != null);
@@ -231,7 +236,7 @@ public class FrameMP extends Application{
         }, FADE_TIME_MILLIS, TimeUnit.MILLISECONDS);
     }
 
-    public void changeQuestionAndOptions(Question newQuestion){
+    public void changeQuestionAndOptions(StatisticQuestionFile newQuestion){
         if(newQuestion != null){
             changeQuestion(newQuestion);
             changeOptions(newQuestion);

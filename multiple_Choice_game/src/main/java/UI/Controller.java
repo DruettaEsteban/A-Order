@@ -9,11 +9,12 @@ import java.util.concurrent.TimeUnit;
 
 
 
-class Controller {
-    private final String rootDirectory = "C:\\Users\\Usuario\\Desktop\\game";
-    private final String XML_FILE_NAME = "\\test.xml";
-    private final String TRUE_DIR_NAME = "\\trueAudios";
-    private final String FALSE_DIR_NAME = "\\falseAudios";
+public class Controller {
+    private static final String rootDirectory = "C:\\Users\\Usuario\\Desktop\\game";
+    private static final String XML_FILE_NAME = "\\test.xml";
+    private static final String TRUE_DIR_NAME = "\\trueAudios";
+    private static final String FALSE_DIR_NAME = "\\falseAudios";
+    public static final String STATISTICS_FILE_DIR = rootDirectory + "\\statistics";
 
     private static AsyncAudioPlayer asyncAudioPlayer;
 
@@ -39,7 +40,6 @@ class Controller {
         executor.schedule(frameMP::fillBar, 1000, TimeUnit.MILLISECONDS);
         executor.schedule(() -> {
 
-
             Answers answers = null;
             frameMP.startCountdown();
             boolean timeOver = false;
@@ -61,6 +61,7 @@ class Controller {
                 frameMP.stopCounter();
                 boolean isCorrect = frameMP.isCorrect(answers);
                 frameMP.evaluateAndDisplay(answers, ()-> asyncAudioPlayer.playRandomAudio(isCorrect));
+                frameMP.getCurrentQuestion().updateProperty(answers);
                 executor.schedule(() -> {
                     Controller.letTheGameBegin(frameMP, questionsFactory, communication);
                     communication.clearPort();

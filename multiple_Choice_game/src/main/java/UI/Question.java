@@ -1,9 +1,8 @@
 package UI;
 
 import java.util.LinkedList;
-import java.util.Random;
 
-public class Question {
+public abstract class Question {
     protected final LinkedList<String> options;
     private final Answers answer;
     protected final String question;
@@ -14,11 +13,11 @@ public class Question {
         return IDENTIFIER;
     }
 
-    public Question(LinkedList<String> options, Answers answer, String question){
+    public Question(LinkedList<String> options, Answers answer, String question, int IDENTIFIER){
         this.options = options;
         this.answer = answer;
         this.question = question;
-        this.IDENTIFIER  = new Random().nextInt(1073741824);
+        this.IDENTIFIER = IDENTIFIER;
 
     }
 

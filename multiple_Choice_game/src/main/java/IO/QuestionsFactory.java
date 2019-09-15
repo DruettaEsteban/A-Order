@@ -1,12 +1,13 @@
 package IO;
 
 import UI.Answers;
-import UI.Question;
+import UI.Controller;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
+import stadistics.StatisticQuestionFile;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -24,7 +25,7 @@ import java.util.Random;
 import java.util.Scanner;
 
 public class QuestionsFactory {
-    private final LinkedList<Question> questions = new LinkedList<>();
+    private final LinkedList<StatisticQuestionFile> questions = new LinkedList<>();
     private final File LOCATION;
     private Document document;
     private Element root;
@@ -79,6 +80,7 @@ public class QuestionsFactory {
                         String B = element.getElementsByTagName("B").item(0).getTextContent();
                         String C = element.getElementsByTagName("C").item(0).getTextContent();
                         String D = element.getElementsByTagName("D").item(0).getTextContent();
+                        String ID = element.getElementsByTagName("id").item(0).getTextContent();
                         Answers answer = null;
                         switch (element.getElementsByTagName("answer").item(0).getTextContent()){
                             case "0":
@@ -97,7 +99,7 @@ public class QuestionsFactory {
                         LinkedList<String> options = new LinkedList<>();
                         Collections.addAll(options, A,B,C,D);
 
-                        Question recoveredQuestion = new Question(options, answer, question);
+                        StatisticQuestionFile recoveredQuestion = new StatisticQuestionFile(options, answer, question, new File(Controller.STATISTICS_FILE_DIR), Integer.parseInt(ID));
                         questions.add(recoveredQuestion);
                     }
                 }
@@ -108,7 +110,7 @@ public class QuestionsFactory {
     }
 
 
-    public void addQuestion(Question question){
+    public void addQuestion(StatisticQuestionFile question){
         //Adds new question to the buffer
         questions.add(question);
 
@@ -169,7 +171,7 @@ public class QuestionsFactory {
 
     }
 
-    public Question getRandomQuestion(){
+    public StatisticQuestionFile getRandomQuestion(){
 
         if(questions.size()> 0) {
             int item = new Random().nextInt(questions.size());
@@ -179,7 +181,7 @@ public class QuestionsFactory {
         }
     }
 
-    public static Question inputQuestion(){
+    public static StatisticQuestionFile inputQuestion(){
         while (true) {
             try {
                 Scanner scanner = new Scanner(System.in);
@@ -222,8 +224,7 @@ public class QuestionsFactory {
                     if (e == null || e.isEmpty()) throw new Exception("Illegal state");
                 }
                 if (question == null || question.isEmpty()) throw new Exception("illegal state");
-
-                return new Question(options, answersRectified, question);
+                return new StatisticQuestionFile(options, answersRectified, question, new File(Controller.STATISTICS_FILE_DIR),  new Random().nextInt(1073741824));
 
 
             } catch (Exception e) {
