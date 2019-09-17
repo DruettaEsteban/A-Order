@@ -2,13 +2,11 @@ package UI;
 
 import IO.QuestionsFactory;
 import javafx.animation.*;
-import javafx.application.Application;
 import javafx.application.Platform;
 import javafx.collections.ObservableList;
 import javafx.event.EventHandler;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
-import javafx.geometry.Rectangle2D;
 import javafx.scene.Scene;
 import javafx.scene.control.Label;
 import javafx.scene.input.KeyCode;
@@ -19,7 +17,6 @@ import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
 import javafx.scene.text.FontPosture;
 import javafx.scene.text.FontWeight;
-import javafx.stage.Screen;
 import javafx.stage.Stage;
 import javafx.util.Duration;
 import stadistics.StatisticQuestionFile;
@@ -31,7 +28,7 @@ import java.util.Random;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
-public class FrameMP extends Application{
+public class FrameMP extends AdaptableWindowApplication {
 
     private final double ANSWER_HEIGHT = getPercentageHeight(4);
     private final double ANSWER_WIDTH = getPercentageWidth(45);
@@ -180,25 +177,6 @@ public class FrameMP extends Application{
     public static void main(String[] args){
         launch();
     }
-
-    private static double getWidth(){
-        Rectangle2D rectangle2D = Screen.getPrimary().getVisualBounds();
-        return rectangle2D.getWidth();
-    }
-
-    private static double getHeight(){
-        Rectangle2D rectangle2D = Screen.getPrimary().getVisualBounds();
-        return rectangle2D.getHeight();
-    }
-
-    private static double getPercentageWidth(double percentage){
-        return ((getWidth() / 100f) * percentage);
-    }
-
-    private static double getPercentageHeight(double percentage){
-        return ((getHeight() / 100f) * percentage);
-    }
-
 
 
     protected void resizeTransitions(){

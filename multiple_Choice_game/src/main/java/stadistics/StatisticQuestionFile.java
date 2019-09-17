@@ -54,9 +54,8 @@ public final class StatisticQuestionFile extends Question {
     }
 
     public void updateProperty(Answers answers){
-        int electionsAmount = (config.getProperty(answers.toString()) == null) ? 0 : (Integer) config.getProperty(answers.toString());
+        int electionsAmount = (config.getProperty(answers.toString()) == null) ? 0 : (config.getProperty(answers.toString()) instanceof String) ? Integer.parseInt( (String) config.getProperty(answers.toString())) : (int) config.getProperty(answers.toString());
         config.setProperty(answers.toString(), ++electionsAmount);
-
     }
 
 

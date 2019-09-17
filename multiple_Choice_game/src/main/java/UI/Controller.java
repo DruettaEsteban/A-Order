@@ -3,6 +3,7 @@ package UI;
 import IO.ArduinoCommunication;
 import IO.AsyncAudioPlayer;
 import IO.QuestionsFactory;
+import javafx.application.Platform;
 
 import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
@@ -61,7 +62,15 @@ public class Controller {
                 frameMP.stopCounter();
                 boolean isCorrect = frameMP.isCorrect(answers);
                 frameMP.evaluateAndDisplay(answers, ()-> asyncAudioPlayer.playRandomAudio(isCorrect));
-                frameMP.getCurrentQuestion().updateProperty(answers);
+
+                Answers finalAnswers = answers;
+                Platform.runLater(new Runnable() {
+                    @Override
+                    public void run() {
+                        frameMP.getCurrentQuestion().updateProperty(finalAnswers);
+                    }
+                });
+
                 executor.schedule(() -> {
                     Controller.letTheGameBegin(frameMP, questionsFactory, communication);
                     communication.clearPort();

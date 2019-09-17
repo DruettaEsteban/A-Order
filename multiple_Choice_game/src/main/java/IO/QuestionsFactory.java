@@ -7,6 +7,7 @@ import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
+import stadistics.QuestionRandomizer;
 import stadistics.StatisticQuestionFile;
 
 import javax.xml.parsers.DocumentBuilder;
@@ -25,7 +26,7 @@ import java.util.Random;
 import java.util.Scanner;
 
 public class QuestionsFactory {
-    private final LinkedList<StatisticQuestionFile> questions = new LinkedList<>();
+    private final QuestionRandomizer<StatisticQuestionFile> questions = new QuestionRandomizer<>();
     private final File LOCATION;
     private Document document;
     private Element root;
@@ -100,19 +101,21 @@ public class QuestionsFactory {
                         Collections.addAll(options, A,B,C,D);
 
                         StatisticQuestionFile recoveredQuestion = new StatisticQuestionFile(options, answer, question, new File(Controller.STATISTICS_FILE_DIR), Integer.parseInt(ID));
-                        questions.add(recoveredQuestion);
+                        questions.updateOriginalList(recoveredQuestion);
                     }
                 }
             }
         } catch (IOException | ParserConfigurationException | SAXException e) {
             System.err.println("Se ha iniciado el sistema sin ninguna pregunta cargada");
         }
+
+        questions.clearAndShuffle();
     }
 
 
     public void addQuestion(StatisticQuestionFile question){
         //Adds new question to the buffer
-        questions.add(question);
+        questions.updateOriginalList(question);
 
         //New Question Marker
         Element questionMarker = document.createElement("simpleQuestion");
@@ -168,17 +171,11 @@ public class QuestionsFactory {
         } catch (TransformerException e) {
             e.printStackTrace();
         }
-
     }
 
-    public StatisticQuestionFile getRandomQuestion(){
 
-        if(questions.size()> 0) {
-            int item = new Random().nextInt(questions.size());
-            return questions.get(item);
-        }else {
-            return null;
-        }
+    public StatisticQuestionFile getRandomQuestion(){
+        return questions.getRandomQuestion();
     }
 
     public static StatisticQuestionFile inputQuestion(){
