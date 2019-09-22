@@ -18,7 +18,13 @@ public abstract class Question {
         this.answer = answer;
         this.question = question;
         this.IDENTIFIER = IDENTIFIER;
+    }
 
+    public Question(Question q){
+        this.options = q.options;
+        this.answer = q.answer;
+        this.question = q.question;
+        this.IDENTIFIER = q.IDENTIFIER;
     }
 
     public LinkedList<String> getOptions() {

@@ -8,6 +8,8 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
 import stadistics.QuestionRandomizer;
+import stadistics.QuestionRectifiedRandomizer;
+import stadistics.StatisticQuestion;
 import stadistics.StatisticQuestionFile;
 
 import javax.xml.parsers.DocumentBuilder;
@@ -110,6 +112,14 @@ public class QuestionsFactory {
         }
 
         questions.clearAndShuffle();
+    }
+
+    public QuestionRectifiedRandomizer<StatisticQuestion> turnToStatisticCollection(){
+        QuestionRectifiedRandomizer<StatisticQuestion> statisticQuestionList = new QuestionRectifiedRandomizer<>();
+        LinkedList<StatisticQuestionFile> questionFiles = this.questions.getQuestions();
+        questionFiles.forEach((q)-> statisticQuestionList.updateOriginalList(new StatisticQuestion(q)));
+        return statisticQuestionList;
+
     }
 
 

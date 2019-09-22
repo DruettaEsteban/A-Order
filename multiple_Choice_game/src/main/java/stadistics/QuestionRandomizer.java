@@ -2,21 +2,21 @@ package stadistics;
 
 import UI.Question;
 
-import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.Random;
 
 public class  QuestionRandomizer<E extends Question> {
-    private final ArrayList<E> originalList;
-    private LinkedList<E> currentIteration;
+    protected LinkedList<E> originalList;
+    protected LinkedList<E> currentIteration;
 
-    public QuestionRandomizer(ArrayList<E> originalList) {
-        this.originalList = new ArrayList<>(originalList);
-        this.currentIteration = new LinkedList<>(originalList);
+
+    public LinkedList<E> getQuestions(){
+
+        return new LinkedList<>(originalList);
     }
 
     public QuestionRandomizer() {
-        this.originalList = new ArrayList<>();
+        this.originalList = new LinkedList<>();
         this.currentIteration = new LinkedList<>();
     }
 
@@ -27,10 +27,11 @@ public class  QuestionRandomizer<E extends Question> {
         }
         if(currentIteration.isEmpty()) resetQuestionQueue();
 
-        return currentIteration.pop();
+        return  currentIteration.pop();
     }
 
-    private void resetQuestionQueue(){
+     void resetQuestionQueue(){
+
         LinkedList<E> buffer = new LinkedList<>(originalList);
         Random random = new Random();
 

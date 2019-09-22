@@ -1,9 +1,11 @@
 package UI;
 
+import Graphs.MainGraph;
 import IO.ArduinoCommunication;
 import IO.AsyncAudioPlayer;
 import IO.QuestionsFactory;
-import javafx.application.Platform;
+import stadistics.QuestionRectifiedRandomizer;
+import stadistics.StatisticQuestion;
 
 import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
@@ -16,8 +18,11 @@ public class Controller {
     private static final String TRUE_DIR_NAME = "\\trueAudios";
     private static final String FALSE_DIR_NAME = "\\falseAudios";
     public static final String STATISTICS_FILE_DIR = rootDirectory + "\\statistics";
-
+    public static final int UPDATE_GRAPH_TIME_MILLIS = 10000;
     private static AsyncAudioPlayer asyncAudioPlayer;
+    private static final boolean PLAY_GRAPHS = true;
+    private static volatile QuestionRectifiedRandomizer<StatisticQuestion> rectifiedRandomizer;
+
 
 
     public Controller(){
@@ -29,6 +34,25 @@ public class Controller {
         ArduinoCommunication communication = new ArduinoCommunication("COM3");
         asyncAudioPlayer = new AsyncAudioPlayer(rootDirectory + TRUE_DIR_NAME, rootDirectory + FALSE_DIR_NAME);
         letTheGameBegin(frameMP, questionsFactory, communication);
+
+
+        if (PLAY_GRAPHS) {
+            rectifiedRandomizer = questionsFactory.turnToStatisticCollection();
+            MainGraph mainGraph = new MainGraph();
+            displayStatistics(mainGraph);
+
+            Thread graphThread = new Thread(() -> {
+
+                while (true){
+                    displayStatistics(mainGraph);
+                    System.out.println("SHOULD BE THE SAMEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEE");
+                    rectifiedRandomizer.getQuestions().forEach(System.out::println);
+                }
+
+            });
+            graphThread.start();
+
+        }
 
     }
 
@@ -64,12 +88,11 @@ public class Controller {
                 frameMP.evaluateAndDisplay(answers, ()-> asyncAudioPlayer.playRandomAudio(isCorrect));
 
                 Answers finalAnswers = answers;
-                Platform.runLater(new Runnable() {
-                    @Override
-                    public void run() {
-                        frameMP.getCurrentQuestion().updateProperty(finalAnswers);
-                    }
-                });
+
+                frameMP.getCurrentQuestion().updateProperty(finalAnswers);
+                rectifiedRandomizer.updateQuestion(frameMP.getCurrentQuestion());
+
+
 
                 executor.schedule(() -> {
                     Controller.letTheGameBegin(frameMP, questionsFactory, communication);
@@ -83,6 +106,18 @@ public class Controller {
 
 
         },2500, TimeUnit.MILLISECONDS);
+    }
+
+
+
+    private static void displayStatistics(MainGraph mainGraph) {
+
+            try {
+                mainGraph.updateGraph((StatisticQuestion) rectifiedRandomizer.getRandomQuestion());
+                Thread.sleep(UPDATE_GRAPH_TIME_MILLIS);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
 
 
     }

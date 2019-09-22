@@ -205,7 +205,7 @@ public class FrameMP extends AdaptableWindowApplication {
                 int finalI = i;
                 Platform.runLater(()->{
                     options.get(finalI).setText(newOptions.getOptions().get(finalI));
-                    System.out.println("option " + options.get(finalI));
+                    //System.out.println("option " + options.get(finalI));
                 });
 
             }
