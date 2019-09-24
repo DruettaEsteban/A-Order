@@ -18,7 +18,7 @@ public class Controller {
     private static final String TRUE_DIR_NAME = "\\trueAudios";
     private static final String FALSE_DIR_NAME = "\\falseAudios";
     public static final String STATISTICS_FILE_DIR = rootDirectory + "\\statistics";
-    public static final int UPDATE_GRAPH_TIME_MILLIS = 10000;
+    public static final int UPDATE_GRAPH_TIME_MILLIS = 15000;
     private static AsyncAudioPlayer asyncAudioPlayer;
     private static final boolean PLAY_GRAPHS = true;
     private static volatile QuestionRectifiedRandomizer<StatisticQuestion> rectifiedRandomizer;
@@ -30,10 +30,10 @@ public class Controller {
     }
 
     public void control(FrameMP frameMP){
+
         QuestionsFactory questionsFactory = QuestionsFactory.newInstance(rootDirectory + XML_FILE_NAME);
         ArduinoCommunication communication = new ArduinoCommunication("COM3");
         asyncAudioPlayer = new AsyncAudioPlayer(rootDirectory + TRUE_DIR_NAME, rootDirectory + FALSE_DIR_NAME);
-        letTheGameBegin(frameMP, questionsFactory, communication);
 
 
         if (PLAY_GRAPHS) {
@@ -45,14 +45,18 @@ public class Controller {
 
                 while (true){
                     displayStatistics(mainGraph);
-                    System.out.println("SHOULD BE THE SAMEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEE");
-                    rectifiedRandomizer.getQuestions().forEach(System.out::println);
                 }
 
             });
             graphThread.start();
-
         }
+
+
+
+        ScheduledThreadPoolExecutor executor = new ScheduledThreadPoolExecutor(1);
+        executor.schedule(() -> letTheGameBegin(frameMP, questionsFactory, communication), 30, TimeUnit.SECONDS);
+
+
 
     }
 
@@ -63,8 +67,8 @@ public class Controller {
         ScheduledThreadPoolExecutor executor = new ScheduledThreadPoolExecutor(2);
 
         executor.schedule(frameMP::fillBar, 1000, TimeUnit.MILLISECONDS);
-        executor.schedule(() -> {
 
+        executor.schedule(() -> {
             Answers answers = null;
             frameMP.startCountdown();
             boolean timeOver = false;

@@ -79,7 +79,7 @@ public class FrameMP extends AdaptableWindowApplication {
         Collections.addAll(options, optionA, optionB, optionC, optionD);
 
         options.forEach(e -> e.setWrapText(true));
-        options.forEach(e -> e.setFont(Font.font("verdana", FontWeight.BOLD, FontPosture.REGULAR,20)));
+        options.forEach(e -> e.setFont(Font.font("verdana", FontWeight.BOLD, FontPosture.REGULAR,30)));
 
         answersContainer = new VBox();
         answersContainer.setSpacing(ANSWERS_SEPARATION);
@@ -104,7 +104,7 @@ public class FrameMP extends AdaptableWindowApplication {
         question = new Label();
         VBox.setMargin(question, new Insets(RESPONSE_QUESTION_TOP_MARGIN, 0, 0,0));
         question.setStyle("-fx-border-color: black;  -fx-border-width: 2; -fx-border-style: solid inside; -fx-border-radius: 50;");
-        question.setFont(Font.font("verdana", FontWeight.BOLD, FontPosture.REGULAR,30));
+        question.setFont(Font.font("verdana", FontWeight.BOLD, FontPosture.REGULAR,40));
         question.setMaxSize(QUESTION_WIDTH*2, QUESTION_HEIGHT*2);
         question.setMinSize(QUESTION_WIDTH*2, QUESTION_HEIGHT*2);
         question.setPrefSize(QUESTION_WIDTH*2, QUESTION_HEIGHT* 2);
@@ -152,6 +152,11 @@ public class FrameMP extends AdaptableWindowApplication {
                 thread.start();
             }
         };
+
+        primaryStage.setOnCloseRequest(event -> {
+            Platform.exit();
+            System.exit(0);
+        });
 
         scene.addEventHandler(KeyEvent.KEY_PRESSED, eventHandler);
     }

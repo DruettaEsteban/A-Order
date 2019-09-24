@@ -6,7 +6,9 @@ import javafx.animation.FadeTransition;
 import javafx.animation.PauseTransition;
 import javafx.animation.SequentialTransition;
 import javafx.application.Platform;
+import javafx.collections.ObservableList;
 import javafx.geometry.Pos;
+import javafx.geometry.Rectangle2D;
 import javafx.scene.Scene;
 import javafx.scene.chart.BarChart;
 import javafx.scene.chart.CategoryAxis;
@@ -17,7 +19,9 @@ import javafx.scene.layout.StackPane;
 import javafx.scene.text.Font;
 import javafx.scene.text.FontPosture;
 import javafx.scene.text.FontWeight;
+import javafx.stage.Screen;
 import javafx.stage.Stage;
+import javafx.stage.StageStyle;
 import javafx.util.Duration;
 import stadistics.StatisticQuestion;
 
@@ -35,14 +39,19 @@ public class MainGraph  extends AdaptableWindow {
     private boolean ready = false;
     private final int FADE_OUT_MILLIS = 2000;
     private final int FADE_IN_MILLIS = 2000;
+    private boolean TWO_SCREENS = false;
 
 
 
     public MainGraph(){
-        Platform.runLater(new Runnable() {
-            @Override
-            public void run() {
-                Stage graphStage = new Stage();
+        Platform.runLater(() -> {
+
+            Stage graphStage = new Stage(StageStyle.UNDECORATED);
+            TWO_SCREENS = this.moveToSecondScreen(graphStage);
+
+
+            if(TWO_SCREENS) {
+
 
                 StackPane mainContainer = new StackPane();
                 mainContainer.setAlignment(Pos.CENTER);
@@ -53,11 +62,11 @@ public class MainGraph  extends AdaptableWindow {
                 xAxis.setPrefSize(getPercentageWidth(90), getPercentageHeight(10));
 
                 yAxis = new NumberAxis();
+                yAxis.setLabel("%");
                 yAxis.setMaxSize(getPercentageWidth(10), getPercentageHeight(90));
                 yAxis.setMinSize(getPercentageWidth(10), getPercentageHeight(90));
                 yAxis.setPrefSize(getPercentageWidth(10), getPercentageHeight(90));
-                yAxis.setTickLabelFont(Font.font("verdana", FontWeight.BOLD, FontPosture.REGULAR,20));
-
+                yAxis.setTickLabelFont(Font.font("verdana", FontWeight.BOLD, FontPosture.REGULAR, 20));
 
 
                 barChart = new BarChart(xAxis, yAxis);
@@ -75,48 +84,53 @@ public class MainGraph  extends AdaptableWindow {
 
 
                 graphStage.setTitle("Game statistics");
-                graphStage.setFullScreen(true);
+                graphStage.setMaximized(true);
                 graphStage.setScene(new Scene(mainContainer));
+
                 graphStage.show();
                 ready = true;
             }
         });
+
     }
 
 
     public void updateGraph(StatisticQuestion statisticQuestion){
+        if(TWO_SCREENS) {
 
 
-        Platform.runLater(() -> {
+            Platform.runLater(() -> {
 
-            if(ready){
-                fadeInOutDelayed(1000).setOnFinished(event -> {
-                    questionData.getData().clear();
+                if (ready) {
+                    fadeInOutDelayed(1000).setOnFinished(event -> {
+                        questionData.getData().clear();
 
-                    A = new XYChart.Data<>(statisticQuestion.getOptions().get(Answers.A.getAnswer()), statisticQuestion.amountA);
-                    B = new XYChart.Data<>(statisticQuestion.getOptions().get(Answers.B.getAnswer()), statisticQuestion.amountB);
-                    C = new XYChart.Data<>(statisticQuestion.getOptions().get(Answers.C.getAnswer()), statisticQuestion.amountC);
-                    D = new XYChart.Data<>(statisticQuestion.getOptions().get(Answers.D.getAnswer()), statisticQuestion.amountD);
+                        PercentualValues percentualValues = new PercentualValues(statisticQuestion.amountA, statisticQuestion.amountB,statisticQuestion.amountC,statisticQuestion.amountD);
+                        A = new XYChart.Data<>(statisticQuestion.getOptions().get(Answers.A.getAnswer()), percentualValues.getAPercentual());
+                        B = new XYChart.Data<>(statisticQuestion.getOptions().get(Answers.B.getAnswer()), percentualValues.getBPercentual());
+                        C = new XYChart.Data<>(statisticQuestion.getOptions().get(Answers.C.getAnswer()), percentualValues.getCPercentual());
+                        D = new XYChart.Data<>(statisticQuestion.getOptions().get(Answers.D.getAnswer()), percentualValues.getDPercentual());
 
-                    Platform.runLater(() -> {
+                        Platform.runLater(() -> {
 
-                        A.getNode().setStyle("-fx-bar-fill: blue");
-                        B.getNode().setStyle("-fx-bar-fill: black");
-                        C.getNode().setStyle("-fx-bar-fill: yellow");
-                        D.getNode().setStyle("-fx-bar-fill: red");
+                            A.getNode().setStyle("-fx-bar-fill: blue");
+                            B.getNode().setStyle("-fx-bar-fill: black");
+                            C.getNode().setStyle("-fx-bar-fill: yellow");
+                            D.getNode().setStyle("-fx-bar-fill: red");
+                        });
+
+                        questionData.getData().addAll(A, B, C, D);
+
+                        barChart.setTitle(statisticQuestion.getQuestion());
+
                     });
-
-                    questionData.getData().addAll(A, B, C, D);
-
-                    barChart.setTitle(statisticQuestion.getQuestion());
-
-                });
-            }
-        });
+                }
+            });
+        }
         
     }
 
-    public FadeTransition generateFadeOut(){
+    private FadeTransition generateFadeOut(){
         FadeTransition fadeTransition = new FadeTransition(Duration.millis(FADE_OUT_MILLIS), barChart);
         fadeTransition.setFromValue(1.0);
         fadeTransition.setToValue(0.0);
@@ -126,7 +140,7 @@ public class MainGraph  extends AdaptableWindow {
         return fadeTransition;
     }
 
-    public FadeTransition generateFadeIn(){
+    private FadeTransition generateFadeIn(){
         FadeTransition fadeTransition = new FadeTransition(Duration.millis(FADE_IN_MILLIS), barChart);
         fadeTransition.setFromValue(0.0);
         fadeTransition.setToValue(1.0);
@@ -136,7 +150,7 @@ public class MainGraph  extends AdaptableWindow {
         return fadeTransition;
     }
 
-    public FadeTransition fadeInOutDelayed(int delayMillis){
+    private FadeTransition fadeInOutDelayed(int delayMillis){
         FadeTransition out = generateFadeOut();
         FadeTransition in = generateFadeIn();
         PauseTransition pause = new PauseTransition(Duration.millis(delayMillis));
@@ -146,6 +160,20 @@ public class MainGraph  extends AdaptableWindow {
         Platform.runLater(sequentialTransition::play);
 
         return out;
+    }
+
+    private boolean moveToSecondScreen(Stage stage){
+        ObservableList<Screen> screens = Screen.getScreens();
+        if (screens.size() == 1) return false;
+
+
+
+        //Rectangle2D mainScreenDimentions  =mainScreen.getVisualBounds();
+        Rectangle2D secondScreenDimentions = screens.get(1).getVisualBounds();
+
+        stage.setX(secondScreenDimentions.getMinX());
+        stage.setY(secondScreenDimentions.getMinY());
+        return true;
     }
 
 }
