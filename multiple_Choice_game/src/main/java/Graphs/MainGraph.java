@@ -7,6 +7,7 @@ import javafx.animation.PauseTransition;
 import javafx.animation.SequentialTransition;
 import javafx.application.Platform;
 import javafx.collections.ObservableList;
+import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.geometry.Rectangle2D;
 import javafx.scene.Scene;
@@ -25,6 +26,9 @@ import javafx.stage.StageStyle;
 import javafx.util.Duration;
 import stadistics.StatisticQuestion;
 
+import java.util.Arrays;
+import java.util.LinkedList;
+
 public class MainGraph  extends AdaptableWindow {
 
     private CategoryAxis xAxis;
@@ -40,6 +44,7 @@ public class MainGraph  extends AdaptableWindow {
     private final int FADE_OUT_MILLIS = 2000;
     private final int FADE_IN_MILLIS = 2000;
     private boolean TWO_SCREENS = false;
+    private final int LETTERS_PER_LINE = 25;
 
 
 
@@ -63,14 +68,15 @@ public class MainGraph  extends AdaptableWindow {
 
                 yAxis = new NumberAxis();
                 yAxis.setLabel("%");
-                yAxis.setMaxSize(getPercentageWidth(10), getPercentageHeight(90));
-                yAxis.setMinSize(getPercentageWidth(10), getPercentageHeight(90));
-                yAxis.setPrefSize(getPercentageWidth(10), getPercentageHeight(90));
+                yAxis.setMaxSize(getPercentageWidth(6.5), getPercentageHeight(90));
+                yAxis.setMinSize(getPercentageWidth(6.5), getPercentageHeight(90));
+                yAxis.setPrefSize(getPercentageWidth(6.5), getPercentageHeight(90));
                 yAxis.setTickLabelFont(Font.font("verdana", FontWeight.BOLD, FontPosture.REGULAR, 20));
 
-
                 barChart = new BarChart(xAxis, yAxis);
-                barChart.setStyle("-fx-font-size: 30;");
+
+                StackPane.setMargin(barChart, new Insets(getPercentageHeight(4), getPercentageWidth(2), 0, getPercentageWidth(1)));
+                barChart.setStyle("-fx-font-size: 34;");
                 barChart.setLegendVisible(false);
 
 
@@ -95,9 +101,31 @@ public class MainGraph  extends AdaptableWindow {
     }
 
 
+    private String spaceShink(String toBeShinked){
+        LinkedList<String> words = new LinkedList<>(Arrays.asList(toBeShinked.split("\\s+")));
+        StringBuilder result = new StringBuilder();
+
+        StringBuilder buffer = new StringBuilder();
+        for (String word:words) {
+            buffer.append(word + " ");
+            if (buffer.length() > this.LETTERS_PER_LINE){
+                result.append(buffer).append("\n");
+                buffer = new StringBuilder();
+            }
+        }
+        if (buffer.length() > 0) result.append(buffer);
+
+        return result.toString();
+    }
+
+
     public void updateGraph(StatisticQuestion statisticQuestion){
         if(TWO_SCREENS) {
 
+            String AText = spaceShink(statisticQuestion.getOptions().get(Answers.A.getAnswer()));
+            String BText = spaceShink(statisticQuestion.getOptions().get(Answers.B.getAnswer()));
+            String CText = spaceShink(statisticQuestion.getOptions().get(Answers.C.getAnswer()));
+            String DText = spaceShink(statisticQuestion.getOptions().get(Answers.D.getAnswer()));
 
             Platform.runLater(() -> {
 
@@ -106,10 +134,10 @@ public class MainGraph  extends AdaptableWindow {
                         questionData.getData().clear();
 
                         PercentualValues percentualValues = new PercentualValues(statisticQuestion.amountA, statisticQuestion.amountB,statisticQuestion.amountC,statisticQuestion.amountD);
-                        A = new XYChart.Data<>(statisticQuestion.getOptions().get(Answers.A.getAnswer()), percentualValues.getAPercentual());
-                        B = new XYChart.Data<>(statisticQuestion.getOptions().get(Answers.B.getAnswer()), percentualValues.getBPercentual());
-                        C = new XYChart.Data<>(statisticQuestion.getOptions().get(Answers.C.getAnswer()), percentualValues.getCPercentual());
-                        D = new XYChart.Data<>(statisticQuestion.getOptions().get(Answers.D.getAnswer()), percentualValues.getDPercentual());
+                        A = new XYChart.Data<>(AText, percentualValues.getAPercentual());
+                        B = new XYChart.Data<>(BText, percentualValues.getBPercentual());
+                        C = new XYChart.Data<>(CText, percentualValues.getCPercentual());
+                        D = new XYChart.Data<>(DText, percentualValues.getDPercentual());
 
                         Platform.runLater(() -> {
 
@@ -120,7 +148,6 @@ public class MainGraph  extends AdaptableWindow {
                         });
 
                         questionData.getData().addAll(A, B, C, D);
-
                         barChart.setTitle(statisticQuestion.getQuestion());
 
                     });

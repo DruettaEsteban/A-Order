@@ -79,7 +79,7 @@ public class TimeBar extends ProgressBar {
 
         EventHandler<ActionEvent> handler = event -> {
             stopCountdown();
-            System.out.println(currentTransitionTime);
+            //System.out.println(currentTransitionTime);
         };
 
 

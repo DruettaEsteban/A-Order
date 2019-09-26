@@ -12,7 +12,7 @@ public class QuestionRectifiedRandomizer <E extends StatisticQuestion> extends Q
 
         while (!buffer.isEmpty()){
             super.currentIteration.add(buffer.pop());
-            System.out.println("here");
+            //System.out.println("here");
         }
     }
 

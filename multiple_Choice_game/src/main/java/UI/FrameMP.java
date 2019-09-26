@@ -254,7 +254,7 @@ public class FrameMP extends AdaptableWindowApplication {
 
 
 
-    private void turnGreen(Answers answer){
+    private void turnGreen(Answers answer, String optional){
 
         int duration = FADE_COLOR_TIME_MILLIS;
         Platform.runLater(()->{
@@ -269,7 +269,7 @@ public class FrameMP extends AdaptableWindowApplication {
         Thread turnGreen = new Thread(() -> {
             try {
                 Thread.sleep(duration);
-                    Platform.runLater(()->options.get(answer.getAnswer()).setStyle("-fx-background-color: green; -fx-background-radius: 50 50 50 50;"+"-fx-padding: "+ ANSWER_HEIGHT + " " + ANSWER_WIDTH + " " + ANSWER_HEIGHT + " "+ ANSWER_WIDTH+"; -fx-border-color: black;  -fx-border-width: 2; -fx-border-style: solid inside; -fx-border-radius: 50;"));
+                    Platform.runLater(()->options.get(answer.getAnswer()).setStyle("-fx-background-color: green; -fx-background-radius: 50 50 50 50;"+"-fx-padding: "+ ANSWER_HEIGHT + " " + ANSWER_WIDTH + " " + ANSWER_HEIGHT + " "+ ANSWER_WIDTH+"; -fx-border-color: black;  -fx-border-width: 2; -fx-border-style: solid inside; -fx-border-radius: 50;" + optional));
 
             } catch (InterruptedException e) {
                 e.printStackTrace();
@@ -316,7 +316,7 @@ public class FrameMP extends AdaptableWindowApplication {
         fadeInOption(Answers.D);
     }
 
-    private void turnRed(Answers answer){
+    private void turnRed(Answers answer, String optional){
 
         int duration = FADE_COLOR_TIME_MILLIS;
 
@@ -333,7 +333,7 @@ public class FrameMP extends AdaptableWindowApplication {
             Thread turnRed = new Thread(() -> {
                 try {
                     Thread.sleep(duration);
-                    Platform.runLater(()->options.get(answer.getAnswer()).setStyle("-fx-background-color: red; -fx-background-radius: 50 50 50 50;"+"; -fx-border-color: black;  -fx-border-width: 2; -fx-border-style: solid inside; -fx-border-radius: 50;"));
+                    Platform.runLater(()->options.get(answer.getAnswer()).setStyle("-fx-background-color: red; -fx-background-radius: 50 50 50 50;"+"; -fx-border-color: black;  -fx-border-width: 2; -fx-border-style: solid inside; -fx-border-radius: 50;" + optional));
                 } catch (InterruptedException e) {
                     e.printStackTrace();
                 }
@@ -393,7 +393,7 @@ public class FrameMP extends AdaptableWindowApplication {
                     break;
                 case 3:
                 default:
-                    answerColor = "-fx-border-color: red;";
+                    answerColor = "-fx-border-color: rgb(255, 94, 94);";
                     break;
             }
 
@@ -417,11 +417,11 @@ public class FrameMP extends AdaptableWindowApplication {
             completelyIncorrect.remove(firstDeleted);
 
 
-            executorService.schedule(() -> Platform.runLater(()-> simpleTreatment.treatWrong(firstDeleted)), 2, TimeUnit.SECONDS);
+            executorService.schedule(() -> Platform.runLater(()-> simpleTreatment.treatWrong(firstDeleted, "")), 2, TimeUnit.SECONDS);
 
 
             Answers secondDeleted = completelyIncorrect.pop();
-            executorService.schedule(() -> Platform.runLater(()->simpleTreatment.treatWrong(secondDeleted)), 5, TimeUnit.SECONDS);
+            executorService.schedule(() -> Platform.runLater(()->simpleTreatment.treatWrong(secondDeleted, "")), 5, TimeUnit.SECONDS);
 
 
             Answers wrong;
@@ -434,8 +434,8 @@ public class FrameMP extends AdaptableWindowApplication {
 
 
             executorService.schedule(() -> {
-                simpleTreatment.treatWrong(wrong);
-                simpleTreatment.treatRight(correct);
+                simpleTreatment.treatWrong(wrong, (wrong.getAnswer() == userResponse.getAnswer()) ? answerColor + "-fx-border-width: 8;":"");
+                simpleTreatment.treatRight(correct, (correct.getAnswer() == userResponse.getAnswer()) ? answerColor + "-fx-border-width: 8;":"");
                 executorService.schedule(resultAction, (long) (this.RESIZE_TIME_MILLIS*1.2),TimeUnit.MILLISECONDS);
             }, 10, TimeUnit.SECONDS);
 
@@ -444,14 +444,14 @@ public class FrameMP extends AdaptableWindowApplication {
     }
 
     class SimpleTreatment{
-        void treatWrong(Answers answer){
+        void treatWrong(Answers answer, String optional){
             resizeTransition(answer);
-            turnRed(answer);
+            turnRed(answer, optional);
         }
 
-        void treatRight(Answers answer){
+        void treatRight(Answers answer, String optional){
             resizeTransition(answer);
-            turnGreen(answer);
+            turnGreen(answer, optional);
         }
     }
 
