@@ -7,7 +7,6 @@ import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
-import stadistics.QuestionRandomizer;
 import stadistics.QuestionRectifiedRandomizer;
 import stadistics.StatisticQuestion;
 import stadistics.StatisticQuestionFile;
@@ -28,7 +27,7 @@ import java.util.Random;
 import java.util.Scanner;
 
 public class QuestionsFactory {
-    private final QuestionRandomizer<StatisticQuestionFile> questions = new QuestionRandomizer<>();
+    private final QuestionRectifiedRandomizer<StatisticQuestionFile> questions = new QuestionRectifiedRandomizer<>();
     private final File LOCATION;
     private Document document;
     private Element root;
@@ -185,7 +184,7 @@ public class QuestionsFactory {
 
 
     public StatisticQuestionFile getRandomQuestion(){
-        return questions.getRandomQuestion();
+        return (StatisticQuestionFile) questions.getRandomQuestion();
     }
 
     public static StatisticQuestionFile inputQuestion(){

@@ -4,7 +4,7 @@ import UI.Question;
 
 import java.util.LinkedList;
 
-public class QuestionRectifiedRandomizer <E extends StatisticQuestion> extends QuestionRandomizer{
+public class QuestionRectifiedRandomizer <E extends Question> extends QuestionRandomizer{
 
     @Override
     void resetQuestionQueue(){
