@@ -22,7 +22,10 @@ public class QuestionRectifiedRandomizer <E extends Question> extends QuestionRa
 
         for (Object originalQuestion: originalList) {
             StatisticQuestion originalSQuestion = (StatisticQuestion) originalQuestion;
-            if (originalSQuestion.getIDENTIFIER() == question.getIDENTIFIER()) originalSQuestion.updateQuestionData();
+            if (originalSQuestion.getIDENTIFIER() == question.getIDENTIFIER()){
+                originalSQuestion.updateQuestionData();
+                break;
+            }
         }
 
 

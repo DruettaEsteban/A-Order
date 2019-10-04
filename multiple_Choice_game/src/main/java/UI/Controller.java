@@ -4,6 +4,7 @@ import Graphs.MainGraph;
 import IO.ArduinoCommunication;
 import IO.AsyncAudioPlayer;
 import IO.QuestionsFactory;
+import IO.ResponseStatus;
 import stadistics.QuestionRectifiedRandomizer;
 import stadistics.StatisticQuestion;
 
@@ -20,9 +21,9 @@ public class Controller {
     public static final String STATISTICS_FILE_DIR = rootDirectory + "\\statistics";
     public static final int UPDATE_GRAPH_TIME_MILLIS = 15000;
     private static AsyncAudioPlayer asyncAudioPlayer;
-    private static final boolean PLAY_GRAPHS = true;
+    private static final boolean PLAY_GRAPHS = false;
     private static volatile QuestionRectifiedRandomizer<StatisticQuestion> rectifiedRandomizer;
-
+    private static final boolean UPDATE_STATISTICS = true;
 
 
     public Controller(){
@@ -32,12 +33,13 @@ public class Controller {
     public void control(FrameMP frameMP){
 
         QuestionsFactory questionsFactory = QuestionsFactory.newInstance(rootDirectory + XML_FILE_NAME);
-        ArduinoCommunication communication = new ArduinoCommunication("COM3");
+        //ArduinoCommunication communication = new ArduinoCommunication("COM3");
         asyncAudioPlayer = new AsyncAudioPlayer(rootDirectory + TRUE_DIR_NAME, rootDirectory + FALSE_DIR_NAME);
+
+        if(UPDATE_STATISTICS) rectifiedRandomizer = questionsFactory.turnToStatisticCollection();
 
 
         if (PLAY_GRAPHS) {
-            rectifiedRandomizer = questionsFactory.turnToStatisticCollection();
             MainGraph mainGraph = new MainGraph();
             displayStatistics(mainGraph);
 
@@ -54,11 +56,75 @@ public class Controller {
 
 
         ScheduledThreadPoolExecutor executor = new ScheduledThreadPoolExecutor(1);
-        executor.schedule(() -> letTheGameBegin(frameMP, questionsFactory, communication), 30, TimeUnit.SECONDS);
+        //executor.schedule(() -> letThePcGameBegin(frameMP, questionsFactory, communication), 30, TimeUnit.SECONDS);
+        //executor.schedule(() -> letTheGameBegin(frameMP, questionsFactory), 30, TimeUnit.SECONDS);
+        letTheGameBegin(frameMP, questionsFactory);
 
 
 
     }
+
+    private static void letTheGameBegin(FrameMP frameMP, QuestionsFactory questionsFactory){
+
+        frameMP.changeQuestionAndOptions(questionsFactory.getRandomQuestion());
+
+        ScheduledThreadPoolExecutor executor = new ScheduledThreadPoolExecutor(2);
+
+        executor.schedule(frameMP::fillBar, 1000, TimeUnit.MILLISECONDS);
+
+        executor.schedule(() -> {
+            Answers answers = null;
+            frameMP.startCountdown();
+
+
+            while (answers == null){
+                ResponseStatus responseStatus = frameMP.getUserResponseStatus();
+
+                if (frameMP.isTimeOver()){
+
+                    break;
+                }
+
+                if (responseStatus.isValidState()){
+                    answers = responseStatus.getAnswer();
+                }
+
+                try {
+                    Thread.sleep(10);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+            }
+
+
+
+
+            if(answers != null) {
+                System.out.println(answers);
+                frameMP.stopCounter();
+                boolean isCorrect = frameMP.isCorrect(answers);
+                frameMP.evaluateAndDisplay(answers, ()-> asyncAudioPlayer.playRandomAudio(isCorrect));
+
+                Answers finalAnswers = answers;
+
+                frameMP.getCurrentQuestion().updateProperty(finalAnswers);
+                if (UPDATE_STATISTICS) rectifiedRandomizer.updateQuestion(frameMP.getCurrentQuestion());
+
+                executor.schedule(() -> {
+                    Controller.letTheGameBegin(frameMP, questionsFactory);
+
+
+                },20000, TimeUnit.MILLISECONDS);
+            } else {
+                Controller.letTheGameBegin(frameMP, questionsFactory);
+            }
+
+
+
+        },2500, TimeUnit.MILLISECONDS);
+    }
+
+
 
     private static void letTheGameBegin(FrameMP frameMP, QuestionsFactory questionsFactory, ArduinoCommunication communication){
 
@@ -111,6 +177,7 @@ public class Controller {
 
         },2500, TimeUnit.MILLISECONDS);
     }
+
 
 
 

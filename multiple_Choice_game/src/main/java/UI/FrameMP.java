@@ -1,6 +1,7 @@
 package UI;
 
 import IO.QuestionsFactory;
+import IO.ResponseStatus;
 import javafx.animation.*;
 import javafx.application.Platform;
 import javafx.collections.ObservableList;
@@ -54,6 +55,7 @@ public class FrameMP extends AdaptableWindowApplication {
     private LinkedList<Label> options;
     private VBox answersContainer;
     private VBox questionContainer;
+    private ResponseStatus userResponseStatus = new ResponseStatus(false, Answers.A);
 
     public StatisticQuestionFile getCurrentQuestion() {
         return currentQuestion;
@@ -72,9 +74,13 @@ public class FrameMP extends AdaptableWindowApplication {
 
     public void start(Stage primaryStage) {
         optionA = new Label();
+        optionA.setId("a");
         optionB = new Label();
+        optionB.setId("b");
         optionC = new Label();
+        optionC.setId("c");
         optionD = new Label();
+        optionD.setId("d");
 
         options = new LinkedList<>();
         Collections.addAll(options, optionA, optionB, optionC, optionD);
@@ -154,18 +160,43 @@ public class FrameMP extends AdaptableWindowApplication {
             }
         };
 
-        EventHandler<MouseEvent> eventMouseHandler = event -> {
-            primaryStage.setFullScreen(false);
-            primaryStage.setMaximized(true);
-        };
 
         primaryStage.setOnCloseRequest(event -> {
             Platform.exit();
             System.exit(0);
         });
 
+        EventHandler<MouseEvent> eventMouseHandler = event -> {
+            char type = ((Label) event.getSource()).getId().toCharArray()[0];
+            Answers currentResponse;
+            switch (type){
+                case 'a':
+                    currentResponse = Answers.A;
+                    break;
+                case 'b':
+                    currentResponse = Answers.B;
+                    break;
+                case 'c':
+                    currentResponse = Answers.C;
+                    break;
+                case 'd':
+                default:
+                    currentResponse = Answers.D;
+            }
+
+            userResponseStatus = new ResponseStatus(true, currentResponse);
+        };
+
+
+        optionA.addEventHandler(MouseEvent.MOUSE_CLICKED, eventMouseHandler);
+        optionB.addEventHandler(MouseEvent.MOUSE_CLICKED, eventMouseHandler);
+        optionC.addEventHandler(MouseEvent.MOUSE_CLICKED, eventMouseHandler);
+        optionD.addEventHandler(MouseEvent.MOUSE_CLICKED, eventMouseHandler);
         scene.addEventHandler(KeyEvent.KEY_PRESSED, eventHandler);
-        scene.addEventHandler(MouseEvent.MOUSE_CLICKED, eventMouseHandler);
+    }
+
+    public ResponseStatus getUserResponseStatus(){
+        return this.userResponseStatus.copyAndInvalidate();
     }
 
     public void startCountdown(){
@@ -232,6 +263,7 @@ public class FrameMP extends AdaptableWindowApplication {
             changeOptions(newQuestion);
             this.currentQuestion = newQuestion;
         }
+        userResponseStatus.copyAndInvalidate();
     }
 
 
