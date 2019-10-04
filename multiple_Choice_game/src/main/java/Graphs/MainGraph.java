@@ -127,6 +127,7 @@ public class MainGraph  extends AdaptableWindow {
             String CText = spaceShink(statisticQuestion.getOptions().get(Answers.C.getAnswer()));
             String DText = spaceShink(statisticQuestion.getOptions().get(Answers.D.getAnswer()));
 
+
             Platform.runLater(() -> {
 
                 if (ready) {
@@ -134,10 +135,16 @@ public class MainGraph  extends AdaptableWindow {
                         questionData.getData().clear();
 
                         PercentualValues percentualValues = new PercentualValues(statisticQuestion.amountA, statisticQuestion.amountB,statisticQuestion.amountC,statisticQuestion.amountD);
+
                         A = new XYChart.Data<>(AText, percentualValues.getAPercentual());
                         B = new XYChart.Data<>(BText, percentualValues.getBPercentual());
                         C = new XYChart.Data<>(CText, percentualValues.getCPercentual());
                         D = new XYChart.Data<>(DText, percentualValues.getDPercentual());
+
+                        System.out.println(percentualValues.getAPercentual());
+                        System.out.println(percentualValues.getBPercentual());
+                        System.out.println(percentualValues.getCPercentual());
+                        System.out.println(percentualValues.getDPercentual());
 
                         Platform.runLater(() -> {
 

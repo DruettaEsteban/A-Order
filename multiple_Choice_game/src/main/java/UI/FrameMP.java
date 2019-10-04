@@ -11,6 +11,7 @@ import javafx.scene.Scene;
 import javafx.scene.control.Label;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
+import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
@@ -153,12 +154,18 @@ public class FrameMP extends AdaptableWindowApplication {
             }
         };
 
+        EventHandler<MouseEvent> eventMouseHandler = event -> {
+            primaryStage.setFullScreen(false);
+            primaryStage.setMaximized(true);
+        };
+
         primaryStage.setOnCloseRequest(event -> {
             Platform.exit();
             System.exit(0);
         });
 
         scene.addEventHandler(KeyEvent.KEY_PRESSED, eventHandler);
+        scene.addEventHandler(MouseEvent.MOUSE_CLICKED, eventMouseHandler);
     }
 
     public void startCountdown(){

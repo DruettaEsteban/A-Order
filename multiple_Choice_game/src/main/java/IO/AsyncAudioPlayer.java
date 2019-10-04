@@ -17,10 +17,6 @@ public class AsyncAudioPlayer {
         falseAudiosDir.mkdirs();
     }
 
-    public static void prebuildFileStructure(String trueLocation, String falseLocation){
-        new File(trueLocation).mkdirs();
-        new File(falseLocation).mkdirs();
-    }
 
     public void playRandomAudio(boolean correct){
 
