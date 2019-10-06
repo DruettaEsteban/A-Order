@@ -27,7 +27,6 @@ public final class ArduinoCommunication {
     public Answers readPort(){
         Scanner scanner = new Scanner(this.sp.getInputStream());
         int number = 4;
-            //System.out.println("here");
         while (scanner.hasNextLine()) {  //COULD BE IMPROVED
             try {
                 String result = scanner.nextLine();

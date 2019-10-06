@@ -14,11 +14,11 @@ import java.util.concurrent.TimeUnit;
 
 
 public class Controller {
-    private static final String rootDirectory = "C:\\Users\\Usuario\\Desktop\\game";
-    private static final String XML_FILE_NAME = "\\test.xml";
-    private static final String TRUE_DIR_NAME = "\\trueAudios";
-    private static final String FALSE_DIR_NAME = "\\falseAudios";
-    public static final String STATISTICS_FILE_DIR = rootDirectory + "\\statistics";
+    private static final String rootDirectory = "game";
+    private static final String XML_FILE_NAME = "/test.xml";
+    private static final String TRUE_DIR_NAME = "/trueAudios";
+    private static final String FALSE_DIR_NAME = "/falseAudios";
+    public static final String STATISTICS_FILE_DIR = rootDirectory + "/statistics";
     public static final int UPDATE_GRAPH_TIME_MILLIS = 15000;
     private static AsyncAudioPlayer asyncAudioPlayer;
     private static final boolean PLAY_GRAPHS = false;
@@ -31,6 +31,7 @@ public class Controller {
     }
 
     public void control(FrameMP frameMP){
+        //System.out.println(new File("game/").getAbsolutePath());
 
         QuestionsFactory questionsFactory = QuestionsFactory.newInstance(rootDirectory + XML_FILE_NAME);
         //ArduinoCommunication communication = new ArduinoCommunication("COM3");
@@ -64,7 +65,7 @@ public class Controller {
 
     }
 
-    private static void letTheGameBegin(FrameMP frameMP, QuestionsFactory questionsFactory){
+    private static void letTheGameBegin(FrameMP frameMP, QuestionsFactory questionsFactory) {
 
         frameMP.changeQuestionAndOptions(questionsFactory.getRandomQuestion());
 

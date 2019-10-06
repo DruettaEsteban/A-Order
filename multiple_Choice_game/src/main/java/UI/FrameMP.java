@@ -48,6 +48,7 @@ public class FrameMP extends AdaptableWindowApplication {
     private final int COUNTDOWN_BAR_RIGHT_MARGIN = (int) getPercentageWidth(0);
     private final int COUNTDOWN_BAR_TOP_MARGIN = (int) getPercentageHeight(0);
     private final int COUNTDOWN_TIME_MILLIS = 21000;
+    private boolean IS_PROCESSING_RESPONSE = false;
 
 
     private Label optionA, optionB, optionC, optionD, question;
@@ -166,6 +167,8 @@ public class FrameMP extends AdaptableWindowApplication {
             System.exit(0);
         });
 
+
+
         EventHandler<MouseEvent> eventMouseHandler = event -> {
             char type = ((Label) event.getSource()).getId().toCharArray()[0];
             Answers currentResponse;
@@ -187,6 +190,58 @@ public class FrameMP extends AdaptableWindowApplication {
             userResponseStatus = new ResponseStatus(true, currentResponse);
         };
 
+
+        final String style_root = "-fx-border-width: 5; -fx-border-style: solid inside; -fx-border-radius: 50;-fx-background-color: white; -fx-background-radius: 50 50 50 50;";
+        EventHandler<MouseEvent> colorPointerHandler = event -> {
+            if(!IS_PROCESSING_RESPONSE) {
+                char type = ((Label) event.getSource()).getId().toCharArray()[0];
+                switch (type) {
+                    case 'a':
+                        Platform.runLater(() -> optionA.setStyle("-fx-border-color: blue;" + style_root));
+                        break;
+                    case 'b':
+                        Platform.runLater(() -> optionB.setStyle("-fx-border-color: black;" + style_root));
+                        break;
+                    case 'c':
+                        Platform.runLater(() -> optionC.setStyle("-fx-border-color: yellow;" + style_root));
+                        break;
+                    case 'd':
+                        Platform.runLater(() -> optionD.setStyle("-fx-border-color: rgb(255, 94, 94);" + style_root));
+                    default:
+                }
+            }
+        };
+
+        final String default_style = "-fx-background-color: white; -fx-background-radius: 50 50 50 50; -fx-border-color: black;  -fx-border-width: 2; -fx-border-style: solid inside; -fx-border-radius: 50;";
+        EventHandler<MouseEvent> colorPointerDefaulterHandler = event -> {
+            if(!IS_PROCESSING_RESPONSE){
+                char type = ((Label) event.getSource()).getId().toCharArray()[0];
+                switch (type){
+                    case 'a':
+                        Platform.runLater(()->optionA.setStyle(default_style));
+                        break;
+                    case 'b':
+                        Platform.runLater(()->optionB.setStyle(default_style));
+                        break;
+                    case 'c':
+                        Platform.runLater(()->optionC.setStyle(default_style));
+                        break;
+                    case 'd':
+                        Platform.runLater(()->optionD.setStyle(default_style));
+                    default:
+                }
+            }
+        };
+
+        optionA.addEventHandler(MouseEvent.MOUSE_EXITED, colorPointerDefaulterHandler);
+        optionB.addEventHandler(MouseEvent.MOUSE_EXITED, colorPointerDefaulterHandler);
+        optionC.addEventHandler(MouseEvent.MOUSE_EXITED, colorPointerDefaulterHandler);
+        optionD.addEventHandler(MouseEvent.MOUSE_EXITED, colorPointerDefaulterHandler);
+
+        optionA.addEventHandler(MouseEvent.MOUSE_ENTERED, colorPointerHandler);
+        optionB.addEventHandler(MouseEvent.MOUSE_ENTERED, colorPointerHandler);
+        optionC.addEventHandler(MouseEvent.MOUSE_ENTERED, colorPointerHandler);
+        optionD.addEventHandler(MouseEvent.MOUSE_ENTERED, colorPointerHandler);
 
         optionA.addEventHandler(MouseEvent.MOUSE_CLICKED, eventMouseHandler);
         optionB.addEventHandler(MouseEvent.MOUSE_CLICKED, eventMouseHandler);
@@ -264,6 +319,8 @@ public class FrameMP extends AdaptableWindowApplication {
             this.currentQuestion = newQuestion;
         }
         userResponseStatus.copyAndInvalidate();
+        ScheduledThreadPoolExecutor executor = new ScheduledThreadPoolExecutor(1);
+        executor.schedule(()-> IS_PROCESSING_RESPONSE = false, this.FADE_TIME_MILLIS*2, TimeUnit.MILLISECONDS);
     }
 
 
@@ -418,6 +475,7 @@ public class FrameMP extends AdaptableWindowApplication {
     public void evaluateAndDisplay(Answers userResponse, Runnable resultAction){
 
         if(canEvaluate()){
+            IS_PROCESSING_RESPONSE = true;
             Answers correct = currentQuestion.getAnswer();
             String answerColor;
             switch (userResponse.getAnswer()){
@@ -436,8 +494,8 @@ public class FrameMP extends AdaptableWindowApplication {
                     break;
             }
 
-
             Platform.runLater(()->options.get(userResponse.getAnswer()).setStyle(answerColor+"-fx-border-width: 8; -fx-border-style: solid inside; -fx-border-radius: 50;-fx-background-color: white; -fx-background-radius: 50 50 50 50;"));
+
 
             Answers[] representationArray= new Answers[]{Answers.A,Answers.B, Answers.C, Answers.D};
             final LinkedList<Answers> completelyIncorrect = new LinkedList<>(Arrays.asList(representationArray));
